@@ -1,11 +1,16 @@
 package com.example.rapidrescue.ui.screens.onboarding
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.airbnb.lottie.compose.*
 import com.example.rapidrescue.R
@@ -38,10 +43,24 @@ fun OnboardingScreen(
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        Text("Welcome to Rapid Rescue", style = MaterialTheme.typography.headlineMedium)
-
-        Button(onClick = onGetStartedClick) {
+        Text(
+            text = "Welcome to\nRapid Rescue",
+            style = MaterialTheme.typography.headlineMedium.copy(
+                fontWeight = FontWeight.ExtraBold,
+                lineHeight = 32.sp
+            ),
+            textAlign = TextAlign.Center,
+            color = Color.White,
+            modifier = Modifier.fillMaxWidth()
+        )
+        Button(
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF1E88E5),
+                contentColor = Color.White
+            ),
+            shape = RoundedCornerShape(16.dp),
+            onClick = onGetStartedClick) {
             Text("Get Started")
-        }
+            }
     }
 }

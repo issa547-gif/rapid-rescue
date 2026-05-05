@@ -8,7 +8,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import android.util.Patterns
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.navigation.NavHostController
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
+import com.example.rapidrescue.R
+import com.example.rapidrescue.ui.theme.black
+import com.example.rapidrescue.ui.theme.primaryColor
 
 @Composable
 fun SignUpScreen(
@@ -30,6 +42,17 @@ fun SignUpScreen(
             isEmailValid &&
             isPasswordValid &&
             passwordsMatch
+    val composition by rememberLottieComposition(
+        LottieCompositionSpec.RawRes(R.raw.security)
+    )
+    val progress by animateLottieCompositionAsState(composition)
+
+    LottieAnimation(
+        composition = composition,
+        progress = { progress },
+        modifier = Modifier.size(500.dp)
+    )
+    Spacer(modifier = Modifier.height(24.dp))
 
     Column(
         modifier = Modifier
@@ -41,7 +64,8 @@ fun SignUpScreen(
 
         Text(
             text = "Sign Up",
-            style = MaterialTheme.typography.headlineMedium
+            style = MaterialTheme.typography.headlineMedium,
+            color = black
         )
 
         Spacer(modifier = Modifier.height(20.dp))
@@ -49,7 +73,7 @@ fun SignUpScreen(
         OutlinedTextField(
             value = name,
             onValueChange = { name = it },
-            label = { Text("Full Name") },
+            label = { Text("Your Full Name") },
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
@@ -62,7 +86,14 @@ fun SignUpScreen(
             label = { Text("Email") },
             singleLine = true,
             isError = email.isNotBlank() && !isEmailValid,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            leadingIcon = {
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.email),
+                    contentDescription = "Email",
+                    tint = primaryColor
+                )
+            },
         )
 
         if (email.isNotBlank() && !isEmailValid) {
@@ -81,7 +112,14 @@ fun SignUpScreen(
             label = { Text("Password") },
             visualTransformation = PasswordVisualTransformation(),
             singleLine = true,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            leadingIcon = {
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.logo),
+                    contentDescription = "password",
+                    tint = primaryColor
+                )
+            },
         )
 
         if (password.isNotBlank() && !isPasswordValid) {
@@ -114,6 +152,11 @@ fun SignUpScreen(
         Spacer(modifier = Modifier.height(20.dp))
 
         Button(
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF1E88E5),
+                contentColor = Color.White
+            ),
+            shape = RoundedCornerShape(16.dp),
             onClick = {
                 if (isFormValid) {
                     onSignUpClick(name, email, password)
@@ -129,7 +172,12 @@ fun SignUpScreen(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        TextButton(onClick = onNavigateToLogin) {
+        TextButton(
+            colors = ButtonDefaults.textButtonColors(
+                contentColor = Color(0xFF1E88E5) // text color
+            ),
+            shape = RoundedCornerShape(12.dp),
+            onClick = onNavigateToLogin) {
             Text("Already have an account? Login")
         }
 

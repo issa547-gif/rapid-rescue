@@ -1,13 +1,25 @@
 package com.example.rapidrescue.ui.screens.authentication.register
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
+import com.example.rapidrescue.R
+import com.example.rapidrescue.ui.theme.black
+import com.example.rapidrescue.ui.theme.primaryColor
 
 @Composable
 fun RegisterScreen(
@@ -25,6 +37,10 @@ fun RegisterScreen(
             email.isNotBlank() &&
             password.length >= 6 &&
             password == confirmPassword
+    val composition by rememberLottieComposition(
+        LottieCompositionSpec.RawRes(R.raw.security)
+    )
+    val progress by animateLottieCompositionAsState(composition)
 
     Column(
         modifier = Modifier
@@ -33,10 +49,16 @@ fun RegisterScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-
+        LottieAnimation(
+            composition = composition,
+            progress = { progress },
+            modifier = Modifier.size(500.dp)
+        )
+        Spacer(modifier = Modifier.height(24.dp))
         Text(
             text = "Create Account",
-            style = MaterialTheme.typography.headlineMedium
+            style = MaterialTheme.typography.headlineMedium,
+            color = black
         )
 
         Spacer(modifier = Modifier.height(20.dp))
@@ -56,7 +78,14 @@ fun RegisterScreen(
             onValueChange = { email = it },
             label = { Text("Email") },
             singleLine = true,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            leadingIcon = {
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.email),
+                    contentDescription = "Email",
+                    tint = primaryColor
+                )
+            },
         )
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -67,7 +96,14 @@ fun RegisterScreen(
             label = { Text("Password") },
             visualTransformation = PasswordVisualTransformation(),
             singleLine = true,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            leadingIcon = {
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.logo),
+                    contentDescription = "password",
+                    tint = primaryColor
+                )
+            },
         )
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -84,6 +120,11 @@ fun RegisterScreen(
         Spacer(modifier = Modifier.height(20.dp))
 
         Button(
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF1E88E5),
+                contentColor = Color.White
+            ),
+            shape = RoundedCornerShape(16.dp),
             onClick = {
                 if (isValid) {
                     onRegisterClick(name, email, password)
@@ -100,7 +141,12 @@ fun RegisterScreen(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        TextButton(onClick = onBackToLogin) {
+        TextButton(
+            colors = ButtonDefaults.textButtonColors(
+                contentColor = Color(0xFF1E88E5) // text color
+            ),
+            shape = RoundedCornerShape(12.dp),
+            onClick = onBackToLogin) {
             Text("Already have an account? Login")
         }
 

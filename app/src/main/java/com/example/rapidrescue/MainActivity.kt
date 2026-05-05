@@ -20,7 +20,7 @@ class MainActivity : ComponentActivity() {
             _root_ide_package_.com.example.rapidrescue.ui.theme.RapidRescueTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     AppNavigation(
-                        navController = navController,
+                        navController = rememberNavController(),
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
