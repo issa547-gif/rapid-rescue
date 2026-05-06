@@ -9,7 +9,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
@@ -19,24 +18,21 @@ import com.example.rapidrescue.R
 import com.example.rapidrescue.ui.theme.black
 import com.example.rapidrescue.ui.theme.primaryColor
 import androidx.compose.ui.graphics.Color
-import com.example.rapidrescue.ui.theme.secondaryColor
-
-
-
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun LoginScreen(
     onLoginClick: (String, String) -> Unit,
     onNavigateToForgot: () -> Unit,
-    onNavigateToSignUp: () -> Unit,
-    navController: NavHostController
+    onNavigateToSignUp: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+
     val composition by rememberLottieComposition(
         LottieCompositionSpec.RawRes(R.raw.security)
     )
-
     val progress by animateLottieCompositionAsState(
         composition,
         iterations = LottieConstants.IterateForever
@@ -51,10 +47,10 @@ fun LoginScreen(
         LottieAnimation(
             composition = composition,
             progress = { progress },
-            modifier = Modifier.size(500.dp)
+            modifier = Modifier.size(180.dp)
         )
-        Spacer(modifier = Modifier.height(24.dp))
 
+        Spacer(modifier = Modifier.height(24.dp))
 
         Text(
             text = "Login",
@@ -76,8 +72,7 @@ fun LoginScreen(
                     contentDescription = "Email",
                     tint = primaryColor
                 )
-            },
-
+            }
         )
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -91,13 +86,22 @@ fun LoginScreen(
             leadingIcon = {
                 Icon(
                     imageVector = ImageVector.vectorResource(R.drawable.logo),
-                    contentDescription = "password",
+                    contentDescription = "Password",
                     tint = primaryColor
                 )
-            },
+            }
         )
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(8.dp))
+
+        TextButton(
+            onClick = onNavigateToForgot,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Forgot password?", color = primaryColor)
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
 
         Button(
             colors = ButtonDefaults.buttonColors(
@@ -106,10 +110,25 @@ fun LoginScreen(
             ),
             shape = RoundedCornerShape(16.dp),
             onClick = { onLoginClick(email, password) },
-            modifier = Modifier.fillMaxWidth(),
-
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(52.dp)
         ) {
-            Text("Login")
+            Text(
+                text = "Login",
+                color = Color.White,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold
+            )
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        TextButton(
+            onClick = onNavigateToSignUp,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Don't have an account? Sign up", color = primaryColor)
         }
     }
 }

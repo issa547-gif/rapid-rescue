@@ -9,7 +9,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
@@ -20,8 +19,7 @@ import com.example.rapidrescue.ui.theme.black
 @Composable
 fun ForgotPasswordScreen(
     onResetClick: (String) -> Unit,
-    onBackToLogin: () -> Unit,
-    navController: NavHostController
+    onBackToLogin: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
     var message by remember { mutableStateOf("") }

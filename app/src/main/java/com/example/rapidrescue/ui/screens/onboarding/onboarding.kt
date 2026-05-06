@@ -11,14 +11,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import com.airbnb.lottie.compose.*
 import com.example.rapidrescue.R
 
 @Composable
 fun OnboardingScreen(
-    onGetStartedClick: () -> Unit,
-    navController: NavHostController
+    onGetStartedClick: () -> Unit
 ) {
     val composition by rememberLottieComposition(
         LottieCompositionSpec.RawRes(R.raw.security)
@@ -34,7 +32,6 @@ fun OnboardingScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-
         LottieAnimation(
             composition = composition,
             progress = { progress },
@@ -53,14 +50,16 @@ fun OnboardingScreen(
             color = Color.White,
             modifier = Modifier.fillMaxWidth()
         )
+
         Button(
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color(0xFF1E88E5),
                 contentColor = Color.White
             ),
             shape = RoundedCornerShape(16.dp),
-            onClick = onGetStartedClick) {
+            onClick = onGetStartedClick
+        ) {
             Text("Get Started")
-            }
+        }
     }
 }

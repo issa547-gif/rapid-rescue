@@ -9,6 +9,10 @@ enum class ROUTES {
     onboarding,
     Contacts,
     Alerts,
-    Receiver
-}
+    Receiver;
+
+    companion object {
+        const val ReceiverWithArgs = "Receiver/{lat}/{lng}"
+        fun receiverRoute(lat: Double, lng: Double) = "Receiver/$lat/$lng"
+    }
 }

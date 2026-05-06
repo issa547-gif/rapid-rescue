@@ -13,7 +13,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
-import androidx.navigation.NavHostController
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
@@ -25,8 +24,7 @@ import com.example.rapidrescue.ui.theme.primaryColor
 @Composable
 fun SignUpScreen(
     onSignUpClick: (String, String, String) -> Unit,
-    onNavigateToLogin: () -> Unit,
-    navController: NavHostController
+    onNavigateToLogin: () -> Unit
 ) {
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
@@ -47,12 +45,7 @@ fun SignUpScreen(
     )
     val progress by animateLottieCompositionAsState(composition)
 
-    LottieAnimation(
-        composition = composition,
-        progress = { progress },
-        modifier = Modifier.size(500.dp)
-    )
-    Spacer(modifier = Modifier.height(24.dp))
+
 
     Column(
         modifier = Modifier
@@ -61,7 +54,12 @@ fun SignUpScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-
+        LottieAnimation(
+            composition = composition,
+            progress = { progress },
+            modifier = Modifier.size(180.dp)
+        )
+        Spacer(modifier = Modifier.height(24.dp))
         Text(
             text = "Sign Up",
             style = MaterialTheme.typography.headlineMedium,
