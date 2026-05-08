@@ -18,6 +18,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 
+data class Alert(
+    val id: String,
+    val title: String,
+    val description: String,
+    val timestamp: String
+)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AlertsScreen(
@@ -29,14 +36,18 @@ fun AlertsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Alert History") },
+                title = { Text("Alert history") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color(0xFFF4F6F9)
+                )
             )
-        }
+        },
+        containerColor = Color(0xFFF4F6F9)
     ) { padding ->
         if (alerts.isEmpty()) {
             Box(
@@ -71,8 +82,7 @@ fun AlertsScreen(
 private fun AlertCard(alert: Alert) {
     Card(
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        border = CardDefaults.outlinedCardBorder(),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(
@@ -83,7 +93,7 @@ private fun AlertCard(alert: Alert) {
             Icon(
                 imageVector = Icons.Default.Warning,
                 contentDescription = null,
-                tint = Color(0xFFD32F2F),
+                tint = Color(0xFFB91C1C),
                 modifier = Modifier.size(24.dp)
             )
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {

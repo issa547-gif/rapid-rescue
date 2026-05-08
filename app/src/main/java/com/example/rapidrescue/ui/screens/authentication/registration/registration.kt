@@ -1,5 +1,6 @@
 package com.example.rapidrescue.ui.screens.authentication.register
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -19,6 +20,7 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.rapidrescue.R
 import com.example.rapidrescue.ui.theme.black
+import com.example.rapidrescue.ui.theme.maroon
 import com.example.rapidrescue.ui.theme.primaryColor
 
 @Composable
@@ -42,6 +44,13 @@ fun RegisterScreen(
     )
     val progress by animateLottieCompositionAsState(composition)
 
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(maroon)
+    ) {
+
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()

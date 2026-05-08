@@ -1,5 +1,8 @@
 package com.example.rapidrescue.ui.screens.home
 
+import android.Manifest
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -21,19 +24,22 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun HomeScreen(
     onSOSTrigger: (Double, Double) -> Unit,
     onNavigateToContacts: () -> Unit,
-    onNavigateToAlerts: () -> Unit
+    onNavigateToAlerts: () -> Unit,
+    alertViewModel: AlertViewModel = viewModel()
 ) {
-    val placeholderLat = -1.2921
-    val placeholderLng = 36.8219
+    val context = LocalContext.current
+    val sosState by alertViewModel.sosState.collectAsState()
 
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
@@ -42,6 +48,24 @@ fun HomeScreen(
         animationSpec = tween(100),
         label = "sos-scale"
     )
+
+    LaunchedEffect(sosState) {
+        if (sosState is SOSState.Success) {
+            val state = sosState as SOSState.Success
+            onSOSTrigger(state.lat, state.lng)
+            alertViewModel.resetState()
+        }
+    }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val granted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+                permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+        if (granted) {
+            alertViewModel.triggerSOS(context)
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -54,8 +78,6 @@ fun HomeScreen(
             verticalArrangement = Arrangement.spacedBy(40.dp),
             modifier = Modifier.padding(24.dp)
         ) {
-
-            // Header
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(6.dp)
@@ -75,75 +97,92 @@ fun HomeScreen(
                 )
             }
 
-            // SOS button
             Box(contentAlignment = Alignment.Center) {
-                // outer pulse ring
                 Box(
                     modifier = Modifier
                         .size(220.dp)
                         .clip(CircleShape)
-                        .background(Color(0xFFD32F2F).copy(alpha = 0.15f))
+                        .background(Color(0xFFB91C1C).copy(alpha = 0.15f))
                 )
-                // inner ring
                 Box(
                     modifier = Modifier
                         .size(190.dp)
                         .clip(CircleShape)
-                        .background(Color(0xFFD32F2F).copy(alpha = 0.25f))
+                        .background(Color(0xFFB91C1C).copy(alpha = 0.25f))
                 )
-                // button
                 Box(
                     modifier = Modifier
                         .scale(scale)
                         .size(160.dp)
                         .clip(CircleShape)
-                        .background(Color(0xFFD32F2F))
+                        .background(Color(0xFFB91C1C))
                         .border(3.dp, Color(0xFFFF5252), CircleShape)
                         .clickable(
                             interactionSource = interactionSource,
-                            indication = null
+                            indication = null,
+                            enabled = sosState !is SOSState.Loading
                         ) {
-                            onSOSTrigger(placeholderLat, placeholderLng)
+                            permissionLauncher.launch(
+                                arrayOf(
+                                    Manifest.permission.ACCESS_FINE_LOCATION,
+                                    Manifest.permission.ACCESS_COARSE_LOCATION
+                                )
+                            )
                         },
                     contentAlignment = Alignment.Center
                 ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            text = "SOS",
+                    if (sosState is SOSState.Loading) {
+                        CircularProgressIndicator(
                             color = Color.White,
-                            fontSize = 36.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            letterSpacing = 4.sp
+                            modifier = Modifier.size(40.dp),
+                            strokeWidth = 3.dp
                         )
-                        Text(
-                            text = "HOLD TO SEND",
-                            color = Color.White.copy(alpha = 0.7f),
-                            fontSize = 8.sp,
-                            letterSpacing = 1.sp
-                        )
+                    } else {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(
+                                text = "SOS",
+                                color = Color.White,
+                                fontSize = 36.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                letterSpacing = 4.sp
+                            )
+                            Text(
+                                text = "TAP TO SEND",
+                                color = Color.White.copy(alpha = 0.7f),
+                                fontSize = 8.sp,
+                                letterSpacing = 1.sp
+                            )
+                        }
                     }
                 }
             }
 
-            // Status indicator
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(8.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFF4CAF50))
-                )
+            if (sosState is SOSState.Error) {
                 Text(
-                    text = "Ready to send alert",
-                    fontSize = 12.sp,
-                    color = Color(0xFF4CAF50)
+                    text = (sosState as SOSState.Error).message,
+                    color = Color(0xFFFF5252),
+                    fontSize = 13.sp,
+                    textAlign = TextAlign.Center
                 )
+            } else {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(8.dp)
+                            .clip(CircleShape)
+                            .background(Color(0xFF4CAF50))
+                    )
+                    Text(
+                        text = "Ready to send alert",
+                        fontSize = 12.sp,
+                        color = Color(0xFF4CAF50)
+                    )
+                }
             }
 
-            // Bottom action buttons
             Row(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 modifier = Modifier.fillMaxWidth()
@@ -188,14 +227,9 @@ private fun HomeActionButton(
             tint = Color(0xFF888888)
         )
         Spacer(modifier = Modifier.width(8.dp))
-        Text(
-            text = label,
-            fontSize = 14.sp,
-            color = Color(0xFFCCCCCC)
-        )
+        Text(text = label, fontSize = 14.sp, color = Color(0xFFCCCCCC))
     }
 }
-
 
 //
 //

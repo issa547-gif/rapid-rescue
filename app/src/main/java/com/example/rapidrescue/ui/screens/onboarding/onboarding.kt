@@ -1,5 +1,6 @@
 package com.example.rapidrescue.ui.screens.onboarding
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -13,6 +14,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.airbnb.lottie.compose.*
 import com.example.rapidrescue.R
+import com.example.rapidrescue.ui.theme.DeepNavy
+import com.example.rapidrescue.ui.theme.TextSecondaryDark
+import com.example.rapidrescue.ui.theme.TrustBlue
+import com.example.rapidrescue.ui.theme.maroon
 
 @Composable
 fun OnboardingScreen(
@@ -26,6 +31,13 @@ fun OnboardingScreen(
         composition,
         iterations = LottieConstants.IterateForever
     )
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(DeepNavy)
+    ) {
+
+    }
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -47,19 +59,19 @@ fun OnboardingScreen(
                 lineHeight = 32.sp
             ),
             textAlign = TextAlign.Center,
-            color = Color.White,
+            color = (TextSecondaryDark),
             modifier = Modifier.fillMaxWidth()
         )
 
         Button(
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF1E88E5),
+                containerColor = (TrustBlue),
                 contentColor = Color.White
             ),
             shape = RoundedCornerShape(16.dp),
             onClick = onGetStartedClick
         ) {
-            Text("Get Started")
+            Text("GET STARTED")
         }
     }
 }

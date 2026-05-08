@@ -6,41 +6,44 @@ import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.postgrest.from
 
-class AuthRepository: AuthService {
-    val supabase = createSupabaseClient(
-        supabaseUrl = "https://izjioxgbwamfahgpgjbs.supabase.co/rest/v1/",
+class AuthRepository : AuthService {
+
+    private val supabase = createSupabaseClient(
+        supabaseUrl = "https://izjioxgbwamfahgpgjbs.supabase.co",
         supabaseKey = "sb_publishable_DSw74uObt_AgYzwsmWLLkg_JzOdIW61"
-    )  {
+    ) {
         install(Postgrest)
         install(Auth)
     }
-
-
-    override suspend fun registerUser(userDetails: UserModel)  {
+    override suspend fun insertAlert(lat: Double, lng: Double) {
+        supabase.from("alerts").insert(
+            mapOf("lat" to lat, "lng" to lng)
+        )
+    }
+    override suspend fun registerUser(user: UserModel) {
         supabase.auth.signUpWith(Email) {
-            email = userDetails.email
-            password = userDetails.password
+            email = user.email
+            password = user.password
         }
     }
 
-    override suspend fun loginUser(userDetails: UserModel)  {
-        val user = supabase.auth.signInWith(Email) {
-            email = userDetails.email
-            password = userDetails.password
+    override suspend fun loginUser(user: UserModel) {
+        supabase.auth.signInWith(Email) {
+            email = user.email
+            password = user.password
         }
     }
-
     override suspend fun resetPassword(email: String) {
         supabase.auth.resetPasswordForEmail(email = email)
     }
 
     override suspend fun getUserProfile(user: UserModel) {
-//        TODO("Not yet implemented")
+        // implement when profile screen is ready
     }
 
     override suspend fun logoutUser() {
         supabase.auth.signOut()
     }
-
 }

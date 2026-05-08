@@ -1,5 +1,6 @@
 package com.example.rapidrescue.ui.screens.authentication.forgotpassword
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -15,6 +16,8 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.rapidrescue.R
 import com.example.rapidrescue.ui.theme.black
+import com.example.rapidrescue.ui.theme.maroon
+import com.example.rapidrescue.ui.theme.white
 
 @Composable
 fun ForgotPasswordScreen(
@@ -28,6 +31,13 @@ fun ForgotPasswordScreen(
     )
     val progress by animateLottieCompositionAsState(composition)
 
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(maroon)
+    ) {
+
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -53,7 +63,7 @@ fun ForgotPasswordScreen(
         Text(
             text = "Enter your email to reset your password",
             style = MaterialTheme.typography.bodyMedium,
-            color = black
+            color = white
         )
 
         Spacer(modifier = Modifier.height(24.dp))

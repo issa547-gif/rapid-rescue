@@ -9,7 +9,17 @@ enum class ROUTES {
     onboarding,
     Contacts,
     Alerts,
+    Profile,
+    Settings,
+    Privacy,
+    About,
+   Help,
+    Medical,
+    Guardians,
+    Map,
+
     Receiver;
+
 
     companion object {
         const val ReceiverWithArgs = "Receiver/{lat}/{lng}"

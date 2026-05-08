@@ -1,5 +1,6 @@
 package com.example.rapidrescue.ui.screens.contacts
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -16,6 +17,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.rapidrescue.ui.theme.DeepNavy
+import com.example.rapidrescue.ui.theme.SlateWhite
 
 data class Contact(
     val id: String,
@@ -28,9 +31,9 @@ data class Contact(
 fun ContactsScreen(onBack: () -> Unit) {
     val contacts = remember {
         listOf(
-            Contact("1", "Jane Doe", "+254 700 000 001"),
-            Contact("2", "John Smith", "+254 700 000 002"),
-            Contact("3", "Alice Wanjiru", "+254 700 000 003")
+            Contact("1", "Police", "+254 712345678"),
+            Contact("2", "Firefighters", "+254 712345678"),
+            Contact("3", "Ambulance", "+254 712345678")
         )
     }
 
@@ -62,6 +65,13 @@ fun ContactsScreen(onBack: () -> Unit) {
 
 @Composable
 private fun ContactCard(contact: Contact) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(DeepNavy)
+    ) {
+
+    }
     Card(
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),

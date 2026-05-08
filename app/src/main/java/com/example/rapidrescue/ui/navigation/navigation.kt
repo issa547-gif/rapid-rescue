@@ -13,6 +13,11 @@ import com.example.rapidrescue.ui.screens.authentication.signup.SignUpScreen
 import com.example.rapidrescue.ui.screens.contacts.ContactsScreen
 import com.example.rapidrescue.ui.screens.home.HomeScreen
 import com.example.rapidrescue.ui.screens.onboarding.OnboardingScreen
+import com.example.rapidrescue.ui.screens.About.AboutScreen
+import com.example.rapidrescue.ui.screens.Privacy.PrivacyScreen
+import com.example.rapidrescue.ui.screens.profile.ProfileScreen
+import com.example.rapidrescue.ui.screens.Settings.SettingsScreen
+import com.example.rapidrescue.ui.screens.mainscreen.MainScreen
 import com.example.rapidrescue.ui.screens.receiver.ReceiverScreen
 
 @Composable
@@ -32,12 +37,21 @@ fun Navigation() {
         composable(ROUTES.Login.name) {
             LoginScreen(
                 onLoginClick = { _, _ ->
-                    navController.navigate(ROUTES.Home.name) {
+                    navController.navigate("main") {
                         popUpTo(ROUTES.onboarding.name) { inclusive = true }
                     }
                 },
-                onNavigateToSignUp = { navController.navigate(ROUTES.signup.name) },
-                onNavigateToForgot = { navController.navigate(ROUTES.ForgotPassword.name) }
+                onNavigateToForgot = { navController.navigate(ROUTES.ForgotPassword.name) },
+                onNavigateToSignUp = { navController.navigate(ROUTES.signup.name) }
+            )
+        }
+        composable("main") {
+            MainScreen(
+                onLogout = {
+                    navController.navigate(ROUTES.Login.name) {
+                        popUpTo("main") { inclusive = true }
+                    }
+                }
             )
         }
 
@@ -96,6 +110,37 @@ fun Navigation() {
                 }
             )
         }
+        composable("profile") {
+            ProfileScreen(
+                onNavigateToMedical = { navController.navigate("medical") },
+                onNavigateToSettings = { navController.navigate("settings") },
+                onNavigateToPrivacy = { navController.navigate("privacy") },
+                onNavigateToHelp = { navController.navigate("help") },
+                onNavigateToAbout = { navController.navigate("about") },
+                onLogout = {
+                    navController.navigate(ROUTES.Login.name) {
+                        popUpTo(ROUTES.Home.name) { inclusive = true }
+                    }
+                }
+            )
+        }
+        composable("settings") {
+            SettingsScreen(onBack = { navController.popBackStack() })
+        }
+
+        composable("privacy") {
+            PrivacyScreen(onBack = { navController.popBackStack() })
+        }
+
+        composable("about") {
+            AboutScreen(onBack = { navController.popBackStack() })
+        }
+        composable("contacts")  {
+            ContactsScreen(onBack = { navController.popBackStack() })
+        }
+
+
+
     }
 }
 
