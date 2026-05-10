@@ -1,47 +1,44 @@
 package com.example.rapidrescue.ui.screens.alerts
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.rapidrescue.data.models.AlertModel
+import com.example.rapidrescue.data.repositories.AlertRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import kotlinx.coroutines.launch
+
+sealed class AlertsState {
+    object Loading : AlertsState()
+    object Empty : AlertsState()
+    object Idle : AlertsState()
+    data class Error(val message: String) : AlertsState()
+}
 
 class AlertsViewModel : ViewModel() {
 
-    private val _alerts = MutableStateFlow<List<Alert>>(emptyList())
+    private val repository = AlertRepository()
+
+    private val _alerts = MutableStateFlow<List<AlertModel>>(emptyList())
     val alerts = _alerts.asStateFlow()
+
+    private val _state = MutableStateFlow<AlertsState>(AlertsState.Idle)
+    val state = _state.asStateFlow()
 
     init {
         loadAlerts()
     }
 
-    private fun loadAlerts() {
-        val formatter = SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault())
-        _alerts.value = listOf(
-            Alert(
-                id = "1",
-                title = "SOS triggered",
-                description = "Emergency alert sent from home location",
-                timestamp = formatter.format(Date(System.currentTimeMillis() - 3600000))
-            ),
-            Alert(
-                id = "2",
-                title = "SOS triggered",
-                description = "Emergency alert sent from current location",
-                timestamp = formatter.format(Date())
-            )
-        )
-    }
-
-    fun addAlert(description: String) {
-        val formatter = SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault())
-        val newAlert = Alert(
-            id = System.currentTimeMillis().toString(),
-            title = "SOS triggered",
-            description = description,
-            timestamp = formatter.format(Date())
-        )
-        _alerts.value = listOf(newAlert) + _alerts.value
+    fun loadAlerts() {
+        viewModelScope.launch {
+            _state.value = AlertsState.Loading
+            try {
+                val result = repository.getAlerts()
+                _alerts.value = result
+                _state.value = if (result.isEmpty()) AlertsState.Empty else AlertsState.Idle
+            } catch (e: Exception) {
+                _state.value = AlertsState.Error(e.message ?: "Failed to load alerts")
+            }
+        }
     }
 }

@@ -19,6 +19,7 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.rapidrescue.R
+import com.example.rapidrescue.ui.theme.PurpleGrey80
 import com.example.rapidrescue.ui.theme.black
 import com.example.rapidrescue.ui.theme.maroon
 import com.example.rapidrescue.ui.theme.primaryColor
@@ -47,7 +48,7 @@ fun RegisterScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(maroon)
+            .background(PurpleGrey80)
     ) {
 
     }

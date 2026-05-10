@@ -19,12 +19,20 @@ import androidx.navigation.navArgument
 import com.example.rapidrescue.ui.navigation.BottomNavItem
 import com.example.rapidrescue.ui.navigation.ROUTES
 import com.example.rapidrescue.ui.screens.About.AboutScreen
+import com.example.rapidrescue.ui.screens.Help.HelpScreen
 import com.example.rapidrescue.ui.screens.Privacy.PrivacyScreen
 import com.example.rapidrescue.ui.screens.Settings.SettingsScreen
 import com.example.rapidrescue.ui.screens.alerts.AlertsScreen
+import com.example.rapidrescue.ui.screens.contacts.ContactsScreen
+import com.example.rapidrescue.ui.screens.guardians.GuardiansScreen
 import com.example.rapidrescue.ui.screens.home.HomeScreen
+import com.example.rapidrescue.ui.screens.medical.MedicalScreen
 import com.example.rapidrescue.ui.screens.profile.ProfileScreen
 import com.example.rapidrescue.ui.screens.receiver.ReceiverScreen
+import com.example.rapidrescue.ui.theme.CardWhite
+import com.example.rapidrescue.ui.theme.DeepNavy
+import com.example.rapidrescue.ui.theme.PurpleGrey80
+import com.example.rapidrescue.ui.theme.blue
 
 
 @Composable
@@ -56,7 +64,7 @@ fun MainScreen(onLogout: () -> Unit) {
         bottomBar = {
             if (!hideBottomNav) {
                 NavigationBar(
-                    containerColor = Color.White,
+                    containerColor = DeepNavy,
                     tonalElevation = 0.dp
                 ) {
                     bottomNavItems.forEach { item ->
@@ -89,10 +97,10 @@ fun MainScreen(onLogout: () -> Unit) {
                                 )
                             },
                             colors = NavigationBarItemDefaults.colors(
-                                selectedIconColor = Color(0xFF1E5FA5),
+                                selectedIconColor = blue,
                                 selectedTextColor = Color(0xFF1E5FA5),
-                                unselectedIconColor = Color(0xFF94A3B8),
-                                unselectedTextColor = Color(0xFF94A3B8),
+                                unselectedIconColor = CardWhite,
+                                unselectedTextColor = CardWhite,
                                 indicatorColor = Color(0xFFE6F1FB)
                             )
                         )
@@ -155,6 +163,24 @@ fun MainScreen(onLogout: () -> Unit) {
             composable(ROUTES.About.name) {
                 AboutScreen(onBack = { navController.popBackStack() })
             }
+
+            composable(ROUTES.Medical.name) {
+                MedicalScreen(onBack = { navController.popBackStack() })
+            }
+
+            composable(ROUTES.Guardians.name) {
+                GuardiansScreen(onBack = { navController.popBackStack() })
+            }
+
+            composable(ROUTES.Help.name) {
+                HelpScreen(onBack = { navController.popBackStack() })
+            }
+            composable(ROUTES.Contacts.name) {
+                ContactsScreen(onBack = { navController.popBackStack() })
+            }
+
+
+
 
             composable(
                 route = ROUTES.ReceiverWithArgs,

@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -16,22 +17,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-
-data class Alert(
-    val id: String,
-    val title: String,
-    val description: String,
-    val timestamp: String
-)
+import com.example.rapidrescue.data.models.AlertModel
+import com.example.rapidrescue.ui.theme.DeepNavy
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AlertsScreen(
     onBack: () -> Unit,
-    alertsViewModel: AlertsViewModel = viewModel()
+    viewModel: AlertsViewModel = viewModel()
 ) {
-    val alerts by alertsViewModel.alerts.collectAsState()
+    val alerts by viewModel.alerts.collectAsState()
+    val state by viewModel.state.collectAsState()
 
     Scaffold(
         topBar = {
@@ -42,36 +40,85 @@ fun AlertsScreen(
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
                 },
+                actions = {
+                    IconButton(onClick = { viewModel.loadAlerts() }) {
+                        Icon(
+                            Icons.Default.Refresh,
+                            contentDescription = "Refresh",
+                            tint = Color(0xFF1E5FA5)
+                        )
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFFF4F6F9)
-                )
+                    containerColor = DeepNavy                )
             )
         },
-        containerColor = Color(0xFFF4F6F9)
+        containerColor = DeepNavy
     ) { padding ->
-        if (alerts.isEmpty()) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "No alerts sent yet",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        } else {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(alerts, key = { it.id }) { alert ->
-                    AlertCard(alert = alert)
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+        ) {
+            when (state) {
+                is AlertsState.Loading -> {
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.Center),
+                        color = Color(0xFF1E5FA5)
+                    )
+                }
+
+                is AlertsState.Empty -> {
+                    Column(
+                        modifier = Modifier.align(Alignment.Center),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.Warning,
+                            contentDescription = null,
+                            tint = Color(0xFFCBD5E1),
+                            modifier = Modifier.size(48.dp)
+                        )
+                        Text(
+                            text = "No alerts sent yet",
+                            fontSize = 16.sp,
+                            color = Color(0xFF94A3B8)
+                        )
+                        Text(
+                            text = "Your SOS history will appear here",
+                            fontSize = 13.sp,
+                            color = Color(0xFFCBD5E1)
+                        )
+                    }
+                }
+
+                is AlertsState.Error -> {
+                    Column(
+                        modifier = Modifier.align(Alignment.Center),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Text(
+                            text = (state as AlertsState.Error).message,
+                            color = Color(0xFFB91C1C),
+                            fontSize = 14.sp
+                        )
+                        OutlinedButton(onClick = { viewModel.loadAlerts() }) {
+                            Text("Retry")
+                        }
+                    }
+                }
+
+                else -> {
+                    LazyColumn(
+                        contentPadding = PaddingValues(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(alerts, key = { it.id }) { alert ->
+                            AlertCard(alert = alert)
+                        }
+                    }
                 }
             }
         }
@@ -79,9 +126,9 @@ fun AlertsScreen(
 }
 
 @Composable
-private fun AlertCard(alert: Alert) {
+private fun AlertCard(alert: AlertModel) {
     Card(
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -96,23 +143,56 @@ private fun AlertCard(alert: Alert) {
                 tint = Color(0xFFB91C1C),
                 modifier = Modifier.size(24.dp)
             )
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+                modifier = Modifier.weight(1f)
+            ) {
                 Text(
-                    text = alert.title,
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.SemiBold
+                    text = "SOS triggered",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color(0xFF1A2233)
                 )
                 Text(
-                    text = alert.description,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    text = "Lat: %.5f  Lng: %.5f".format(alert.lat, alert.lng),
+                    fontSize = 12.sp,
+                    color = Color(0xFF64748B)
                 )
+                if (alert.address.isNotBlank()) {
+                    Text(
+                        text = alert.address,
+                        fontSize = 12.sp,
+                        color = Color(0xFF64748B)
+                    )
+                }
                 Text(
-                    text = alert.timestamp,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    text = formatTimestamp(alert.createdAt),
+                    fontSize = 11.sp,
+                    color = Color(0xFF94A3B8)
+                )
+            }
+
+            Surface(
+                shape = RoundedCornerShape(8.dp),
+                color = Color(0xFFF0FDF4)
+            ) {
+                Text(
+                    text = alert.status,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Color(0xFF22C55E),
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                 )
             }
         }
+    }
+}
+
+private fun formatTimestamp(raw: String): String {
+    return try {
+        val clean = raw.replace("T", " ").substringBefore(".")
+        clean
+    } catch (e: Exception) {
+        raw
     }
 }

@@ -30,6 +30,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.rapidrescue.ui.theme.CardWhite
+import com.example.rapidrescue.ui.theme.DeepNavy
+import com.example.rapidrescue.ui.theme.PurpleGrey80
 
 @Composable
 fun HomeScreen(
@@ -70,8 +73,9 @@ fun HomeScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF0D0D0D)),
+            .background(DeepNavy),
         contentAlignment = Alignment.Center
+
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -86,11 +90,11 @@ fun HomeScreen(
                     text = "RapidRescue",
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White,
+                    color = CardWhite,
                     letterSpacing = 1.sp
                 )
                 Text(
-                    text = "Tap SOS to alert your emergency contacts",
+                    text = "Tap here to alert your emergency contacts",
                     fontSize = 13.sp,
                     color = Color(0xFF888888),
                     textAlign = TextAlign.Center
@@ -140,9 +144,9 @@ fun HomeScreen(
                     } else {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(
-                                text = "SOS",
+                                text = "CRITICAL\nALERT",
                                 color = Color.White,
-                                fontSize = 36.sp,
+                                fontSize = 20.sp,
                                 fontWeight = FontWeight.ExtraBold,
                                 letterSpacing = 4.sp
                             )

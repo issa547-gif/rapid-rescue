@@ -1,4 +1,4 @@
-package com.example.rapidrescue.ui.screens.contacts
+package com.example.rapidrescue.ui.screens.guardians
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -19,47 +19,127 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.rapidrescue.data.models.Contact
+import com.example.rapidrescue.data.repositories.ContactRepository
 import com.example.rapidrescue.ui.theme.DeepNavy
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+
+class GuardiansViewModel : ViewModel() {
+    private val repository = ContactRepository()
+
+    private val _guardians = MutableStateFlow<List<Contact>>(emptyList())
+    val guardians = _guardians.asStateFlow()
+
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading = _isLoading.asStateFlow()
+
+    private val _error = MutableStateFlow<String?>(null)
+    val error = _error.asStateFlow()
+
+    private val _added = MutableStateFlow(false)
+    val added = _added.asStateFlow()
+
+    init { loadGuardians() }
+
+    fun loadGuardians() {
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                _guardians.value = repository.getContacts().filter { it.isGuardian }
+            } catch (e: Exception) {
+                _error.value = e.message
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    fun addGuardian(name: String, phone: String, relationship: String) {
+        if (name.isBlank() || phone.isBlank()) {
+            _error.value = "Name and phone are required"
+            return
+        }
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                repository.addContact(
+                    Contact(
+                        name = name,
+                        phone = phone,
+                        relationship = relationship,
+                        isGuardian = true
+                    )
+                )
+                loadGuardians()
+                _added.value = true
+            } catch (e: Exception) {
+                _error.value = e.message ?: "Failed to add guardian"
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    fun deleteGuardian(id: String) {
+        viewModelScope.launch {
+            try {
+                repository.deleteContact(id)
+                _guardians.value = _guardians.value.filter { it.id != id }
+            } catch (e: Exception) {
+                _error.value = e.message
+            }
+        }
+    }
+
+    fun resetAdded() { _added.value = false }
+    fun resetError() { _error.value = null }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ContactsScreen(
+fun GuardiansScreen(
     onBack: () -> Unit,
-    viewModel: ContactsViewModel = viewModel()
+    viewModel: GuardiansViewModel = viewModel()
 ) {
-    val contacts by viewModel.contacts.collectAsState()
-    val state by viewModel.state.collectAsState()
-    var showAddSheet by remember { mutableStateOf(false) }
+    val guardians by viewModel.guardians.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+    val error by viewModel.error.collectAsState()
+    val added by viewModel.added.collectAsState()
+    var showSheet by remember { mutableStateOf(false) }
 
-    LaunchedEffect(state) {
-        if (state is ContactsState.Success) {
-            showAddSheet = false
-            viewModel.resetState()
+    LaunchedEffect(added) {
+        if (added) {
+            showSheet = false
+            viewModel.resetAdded()
         }
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Emergency contacts") },
+                title = { Text("Trusted guardians") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = DeepNavy              )
+                    containerColor = DeepNavy
+                )
             )
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { showAddSheet = true },
+                onClick = { showSheet = true },
                 containerColor = Color(0xFF1E5FA5),
                 contentColor = Color.White
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Add contact")
+                Icon(Icons.Default.Add, contentDescription = "Add guardian")
             }
         },
         containerColor = DeepNavy
@@ -69,12 +149,12 @@ fun ContactsScreen(
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            if (state is ContactsState.Loading && contacts.isEmpty()) {
+            if (isLoading && guardians.isEmpty()) {
                 CircularProgressIndicator(
                     modifier = Modifier.align(Alignment.Center),
                     color = Color(0xFF1E5FA5)
                 )
-            } else if (contacts.isEmpty()) {
+            } else if (guardians.isEmpty()) {
                 Column(
                     modifier = Modifier.align(Alignment.Center),
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -87,12 +167,12 @@ fun ContactsScreen(
                         modifier = Modifier.size(48.dp)
                     )
                     Text(
-                        text = "No contacts yet",
+                        text = "No guardians yet",
                         fontSize = 16.sp,
                         color = Color(0xFF94A3B8)
                     )
                     Text(
-                        text = "Tap + to add an emergency contact",
+                        text = "Guardians are alerted when you send SOS",
                         fontSize = 13.sp,
                         color = Color(0xFFCBD5E1)
                     )
@@ -102,44 +182,44 @@ fun ContactsScreen(
                     contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    items(contacts, key = { it.id }) { contact ->
-                        ContactCard(
-                            contact = contact,
-                            onDelete = { viewModel.deleteContact(contact.id) }
+                    items(guardians, key = { it.id }) { guardian ->
+                        GuardianCard(
+                            guardian = guardian,
+                            onDelete = { viewModel.deleteGuardian(guardian.id) }
                         )
                     }
                 }
             }
 
-            if (state is ContactsState.Error) {
+            error?.let {
                 Snackbar(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
-                        .padding(16.dp)
-                ) {
-                    Text((state as ContactsState.Error).message)
-                }
+                        .padding(16.dp),
+                    action = {
+                        TextButton(onClick = { viewModel.resetError() }) {
+                            Text("Dismiss", color = Color.White)
+                        }
+                    }
+                ) { Text(it) }
             }
         }
     }
 
-    if (showAddSheet) {
-        AddContactSheet(
-            isLoading = state is ContactsState.Loading,
-            onDismiss = { showAddSheet = false },
+    if (showSheet) {
+        AddGuardianSheet(
+            isLoading = isLoading,
+            onDismiss = { showSheet = false },
             onAdd = { name, phone, relationship ->
-                viewModel.addContact(name, phone, relationship)
+                viewModel.addGuardian(name, phone, relationship)
             }
         )
     }
 }
 
 @Composable
-private fun ContactCard(
-    contact: Contact,
-    onDelete: () -> Unit
-) {
-    var showDeleteDialog by remember { mutableStateOf(false) }
+private fun GuardianCard(guardian: Contact, onDelete: () -> Unit) {
+    var showDialog by remember { mutableStateOf(false) }
 
     Card(
         shape = RoundedCornerShape(16.dp),
@@ -157,78 +237,76 @@ private fun ContactCard(
                 modifier = Modifier
                     .size(48.dp)
                     .clip(CircleShape)
-                    .background(Color(0xFF1E5FA5).copy(alpha = 0.1f)),
+                    .background(Color(0xFF0D9488).copy(alpha = 0.1f)),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = contact.name.firstOrNull()?.uppercase() ?: "?",
+                    text = guardian.name.firstOrNull()?.uppercase() ?: "?",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF1E5FA5)
+                    color = Color(0xFF0D9488)
                 )
             }
-
             Column(modifier = Modifier.weight(1f)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Text(
+                        text = guardian.name,
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color(0xFF1A2233)
+                    )
+                    Surface(
+                        shape = RoundedCornerShape(6.dp),
+                        color = Color(0xFFE1F5EE)
+                    ) {
+                        Text(
+                            text = "Guardian",
+                            fontSize = 10.sp,
+                            color = Color(0xFF0D9488),
+                            fontWeight = FontWeight.Medium,
+                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                        )
+                    }
+                }
                 Text(
-                    text = contact.name,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color(0xFF1A2233)
-                )
-                Text(
-                    text = contact.phone,
+                    text = guardian.phone,
                     fontSize = 13.sp,
                     color = Color(0xFF64748B)
                 )
-                if (contact.relationship.isNotBlank()) {
+                if (guardian.relationship.isNotBlank()) {
                     Text(
-                        text = contact.relationship,
+                        text = guardian.relationship,
                         fontSize = 12.sp,
                         color = Color(0xFF94A3B8)
                     )
                 }
             }
-
-            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                IconButton(onClick = {}) {
-                    Icon(
-                        Icons.Default.Notifications,
-                        contentDescription = "Send alert",
-                        tint = Color(0xFFB91C1C),
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
-                IconButton(onClick = { showDeleteDialog = true }) {
-                    Icon(
-                        Icons.Default.Delete,
-                        contentDescription = "Delete",
-                        tint = Color(0xFFCBD5E1),
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
+            IconButton(onClick = { showDialog = true }) {
+                Icon(
+                    Icons.Default.Delete,
+                    contentDescription = "Remove",
+                    tint = Color(0xFFCBD5E1),
+                    modifier = Modifier.size(20.dp)
+                )
             }
         }
     }
 
-    if (showDeleteDialog) {
+    if (showDialog) {
         AlertDialog(
-            onDismissRequest = { showDeleteDialog = false },
-            title = { Text("Remove contact") },
-            text = { Text("Remove ${contact.name} from your emergency contacts?") },
+            onDismissRequest = { showDialog = false },
+            title = { Text("Remove guardian") },
+            text = { Text("Remove ${guardian.name} as a trusted guardian?") },
             confirmButton = {
-                TextButton(
-                    onClick = {
-                        onDelete()
-                        showDeleteDialog = false
-                    }
-                ) {
+                TextButton(onClick = { onDelete(); showDialog = false }) {
                     Text("Remove", color = Color(0xFFB91C1C))
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showDeleteDialog = false }) {
-                    Text("Cancel")
-                }
+                TextButton(onClick = { showDialog = false }) { Text("Cancel") }
             }
         )
     }
@@ -236,7 +314,7 @@ private fun ContactCard(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun AddContactSheet(
+private fun AddGuardianSheet(
     isLoading: Boolean,
     onDismiss: () -> Unit,
     onAdd: (String, String, String) -> Unit
@@ -244,7 +322,6 @@ private fun AddContactSheet(
     var name by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
     var relationship by remember { mutableStateOf("") }
-    val isValid = name.isNotBlank() && phone.isNotBlank()
 
     ModalBottomSheet(onDismissRequest = onDismiss) {
         Column(
@@ -255,12 +332,16 @@ private fun AddContactSheet(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                text = "Add emergency contact",
+                text = "Add trusted guardian",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = Color(0xFF1A2233)
             )
-
+            Text(
+                text = "Guardians receive your location when you trigger SOS.",
+                fontSize = 13.sp,
+                color = Color(0xFF64748B)
+            )
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
@@ -269,7 +350,6 @@ private fun AddContactSheet(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp)
             )
-
             OutlinedTextField(
                 value = phone,
                 onValueChange = { phone = it },
@@ -279,7 +359,6 @@ private fun AddContactSheet(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                 shape = RoundedCornerShape(12.dp)
             )
-
             OutlinedTextField(
                 value = relationship,
                 onValueChange = { relationship = it },
@@ -289,10 +368,9 @@ private fun AddContactSheet(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp)
             )
-
             Button(
                 onClick = { onAdd(name, phone, relationship) },
-                enabled = isValid && !isLoading,
+                enabled = name.isNotBlank() && phone.isNotBlank() && !isLoading,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp),
@@ -307,7 +385,7 @@ private fun AddContactSheet(
                     )
                 } else {
                     Text(
-                        "Add contact",
+                        "Add guardian",
                         color = Color.White,
                         fontWeight = FontWeight.SemiBold
                     )

@@ -25,6 +25,7 @@ import com.airbnb.lottie.compose.*
 import com.example.rapidrescue.R
 import com.example.rapidrescue.ui.screens.authentication.authviewmodel.AuthState
 import com.example.rapidrescue.ui.screens.authentication.authviewmodel.AuthViewModel
+import com.example.rapidrescue.ui.theme.CardWhite
 import com.example.rapidrescue.ui.theme.Charcoal
 import com.example.rapidrescue.ui.theme.DeepNavy
 import com.example.rapidrescue.ui.theme.PurpleGrey80
@@ -32,6 +33,7 @@ import com.example.rapidrescue.ui.theme.SlateWhite
 import com.example.rapidrescue.ui.theme.TrustBlue
 import com.example.rapidrescue.ui.theme.black
 import com.example.rapidrescue.ui.theme.grey
+import com.example.rapidrescue.ui.theme.navyBlue
 import com.example.rapidrescue.ui.theme.primaryColor
 
 @Composable
@@ -48,7 +50,10 @@ fun LoginScreen(
     val authState by authViewModel.authState.collectAsState()
 
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.security))
-    val progress by animateLottieCompositionAsState(composition, iterations = LottieConstants.IterateForever)
+    val progress by animateLottieCompositionAsState(
+        composition,
+        iterations = LottieConstants.IterateForever
+    )
 
     LaunchedEffect(authState) {
         if (authState is AuthState.Success) {
@@ -60,146 +65,165 @@ fun LoginScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(PurpleGrey80)
-    )
-    LottieAnimation(
-        composition = composition,
-        progress = { progress },
-        modifier = Modifier
-            .size(180.dp)
-    )
+            .background(navyBlue),
 
-    Spacer(modifier = Modifier.height(16.dp))
-    ElevatedCard(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-
-        elevation = CardDefaults.elevatedCardElevation(
-            defaultElevation = 8.dp
-        ),
-
-        colors = CardDefaults.elevatedCardColors(
-            containerColor = Charcoal
-        )
-    )
-    {
-        Column(
+        contentAlignment = Alignment.Center
+    ) {
+        LottieAnimation(
+            composition = composition,
+            progress = { progress },
             modifier = Modifier
-                .fillMaxSize()
-                .padding(24.dp),
-            verticalArrangement = Arrangement.Center
-        ) {
+                .size(180.dp)
+        )
 
+        Spacer(modifier = Modifier.height(16.dp))
+        ElevatedCard(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(500.dp) // controls total card height
+                .padding(horizontal = 16.dp),
 
-            Text(
-                text = "Welcome back",
-                fontSize = 25.sp,
-                fontWeight = FontWeight.Bold,
-                color = black
+            shape = RoundedCornerShape(24.dp),
 
+            elevation = CardDefaults.elevatedCardElevation(
+                defaultElevation = 6.dp
+            ),
+
+            colors = CardDefaults.elevatedCardColors(
+                containerColor = Charcoal
             )
-            Text(
-                text = "Sign in to your account",
-                fontSize = 14.sp,
-                color = Color(0xFF64748B),
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(top = 4.dp, bottom = 20.dp)
-            )
+        )
+        {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(24.dp),
+                verticalArrangement = Arrangement.Center
+            ) {
 
-            OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text("Email" , color = grey ) },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                leadingIcon = {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(R.drawable.email),
-                        contentDescription = "Email",
-                        tint = primaryColor
-                    )
-                }
-            )
 
-            Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = "Welcome back",
+                    fontSize = 25.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = CardWhite,
 
-            OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
-                label = { Text("Password" ,color = grey)},
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
-                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                leadingIcon = {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(R.drawable.logo),
-                        contentDescription = "Password",
-                        tint = primaryColor
-                    )
-                },
-                trailingIcon = {
-                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
+
+                )
+                Text(
+                    text = "Sign in to your account",
+                    fontSize = 14.sp,
+                    color = Color(0xFF5F6C7E),
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(top = 4.dp, bottom = 20.dp)
+                )
+
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    label = { Text("Email", color = grey) },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    shape =  RoundedCornerShape(16.dp) ,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                    leadingIcon = {
                         Icon(
-                            imageVector = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                            contentDescription = if (passwordVisible) "Hide password" else "Show password",
+                            imageVector = ImageVector.vectorResource(R.drawable.email),
+                            contentDescription = "Email",
                             tint = primaryColor
                         )
                     }
-                }
-            )
-
-            TextButton(
-                onClick = onNavigateToForgot,
-                modifier = Modifier.align(Alignment.End)
-            ) {
-                Text("Forgot password?", color = primaryColor, fontSize = 13.sp)
-            }
-
-            if (authState is AuthState.Error) {
-                Text(
-                    text = (authState as AuthState.Error).message,
-                    color = Color(0xFFB91C1C),
-                    fontSize = 13.sp,
-                    modifier = Modifier.padding(bottom = 8.dp)
                 )
-            }
 
-            Button(
-                onClick = { authViewModel.login(email, password) },
-                enabled = authState !is AuthState.Loading,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = TrustBlue)
-            ) {
-                if (authState is AuthState.Loading) {
-                    CircularProgressIndicator(
-                        color = Color.White,
-                        modifier = Modifier.size(20.dp),
-                        strokeWidth = 2.dp
-                    )
-                } else {
+                Spacer(modifier = Modifier.height(12.dp))
+
+                OutlinedTextField(
+                    value = password,
+                    onValueChange = { password = it },
+                    label = { Text("Password", color = grey) },
+                    shape =  RoundedCornerShape(16.dp) ,
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    leadingIcon = {
+                        Icon(
+                            imageVector = ImageVector.vectorResource(R.drawable.logo),
+                            contentDescription = "Password",
+                            tint = primaryColor
+                        )
+                    },
+                    trailingIcon = {
+                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                            Icon(
+                                imageVector = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                                contentDescription = if (passwordVisible) "Hide password" else "Show password",
+                                tint = primaryColor
+                            )
+                        }
+                    }
+                )
+
+                TextButton(
+                    onClick = onNavigateToForgot,
+                    modifier = Modifier.align(Alignment.End)
+                ) {
+                    Text("Forgot password?", color = primaryColor, fontSize = 13.sp)
+                }
+
+                if (authState is AuthState.Error) {
                     Text(
-                        text = "Sign in",
-                        color = Color.White,
-                        fontSize = 16.sp,
+                        text = (authState as AuthState.Error).message,
+                        color = Color(0xFFB91C1C),
+                        fontSize = 13.sp,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                }
+
+                Button(
+                    onClick = { authViewModel.login(email, password) },
+                    enabled = authState !is AuthState.Loading,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(52.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = TrustBlue)
+                ) {
+                    if (authState is AuthState.Loading) {
+                        CircularProgressIndicator(
+                            color = Color.White,
+                            modifier = Modifier.size(20.dp),
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Text(
+                            text = "Sign in",
+                            color = Color.White,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                TextButton(
+                    onClick = onNavigateToSignUp,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        "Don't have an account? ",
+                        color = Color(0xFF64748B),
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                    Text(
+                        "Sign up",
+                        color = primaryColor,
+                        fontSize = 13.sp,
                         fontWeight = FontWeight.SemiBold
                     )
                 }
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            TextButton(
-                onClick = onNavigateToSignUp,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Don't have an account? ", color = Color(0xFF64748B), fontSize = 13.sp, fontWeight = FontWeight.Bold,)
-                Text("Sign up", color = primaryColor, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
             }
         }
     }

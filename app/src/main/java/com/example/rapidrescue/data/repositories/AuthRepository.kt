@@ -1,31 +1,32 @@
 package com.example.rapidrescue.data.repositories
 
 import com.example.rapidrescue.data.models.UserModel
-import io.github.jan.supabase.auth.Auth
+import com.example.rapidrescue.data.superbaseclient.SupabaseClientProvider
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.builtin.Email
-import io.github.jan.supabase.createSupabaseClient
-import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.from
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
+
+@Serializable
+data class AlertInsert(
+    val user_id: String,
+    val lat: Double,
+    val lng: Double
+)
 
 class AuthRepository : AuthService {
 
-    private val supabase = createSupabaseClient(
-        supabaseUrl = "https://izjioxgbwamfahgpgjbs.supabase.co",
-        supabaseKey = "sb_publishable_DSw74uObt_AgYzwsmWLLkg_JzOdIW61"
-    ) {
-        install(Postgrest)
-        install(Auth)
-    }
-    override suspend fun insertAlert(lat: Double, lng: Double) {
-        supabase.from("alerts").insert(
-            mapOf("lat" to lat, "lng" to lng)
-        )
-    }
+    internal val supabase = SupabaseClientProvider.client
+
     override suspend fun registerUser(user: UserModel) {
         supabase.auth.signUpWith(Email) {
             email = user.email
             password = user.password
+            data = buildJsonObject {
+                put("full_name", user.name)
+            }
         }
     }
 
@@ -35,15 +36,22 @@ class AuthRepository : AuthService {
             password = user.password
         }
     }
+
     override suspend fun resetPassword(email: String) {
         supabase.auth.resetPasswordForEmail(email = email)
     }
 
-    override suspend fun getUserProfile(user: UserModel) {
-        // implement when profile screen is ready
-    }
+    override suspend fun getUserProfile(user: UserModel) {}
 
     override suspend fun logoutUser() {
         supabase.auth.signOut()
+    }
+
+    override suspend fun insertAlert(lat: Double, lng: Double) {
+        val userId = supabase.auth.currentUserOrNull()?.id
+            ?: throw Exception("User not authenticated")
+        supabase.from("alerts").insert(
+            AlertInsert(user_id = userId, lat = lat, lng = lng)
+        )
     }
 }

@@ -19,26 +19,31 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.rapidrescue.ui.theme.CardWhite
+import com.example.rapidrescue.ui.theme.Charcoal
+import com.example.rapidrescue.ui.theme.DeepNavy
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AboutScreen(onBack: () -> Unit) {
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("About RapidRescue") },
+                title = { Text("About RapidRescue",color = CardWhite,  fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFFF4F6F9)
+                    containerColor = DeepNavy
                 )
             )
         },
-        containerColor = Color(0xFFF4F6F9)
-    ) { padding ->
+        containerColor = DeepNavy
+    )
+    { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -51,7 +56,7 @@ fun AboutScreen(onBack: () -> Unit) {
             // App identity card
             Card(
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(containerColor = Charcoal),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(
@@ -84,12 +89,12 @@ fun AboutScreen(onBack: () -> Unit) {
                     Text(
                         text = "Version 1.0.0 (Build 1)",
                         fontSize = 13.sp,
-                        color = Color(0xFF94A3B8)
+                        color = CardWhite
                     )
                     Text(
                         text = "One tap sends your location to your emergency contacts when you're in danger.",
                         fontSize = 13.sp,
-                        color = Color(0xFF64748B),
+                        color = CardWhite,
                         textAlign = TextAlign.Center,
                         lineHeight = 20.sp
                     )
@@ -108,7 +113,7 @@ fun AboutScreen(onBack: () -> Unit) {
                 )
                 Card(
                     shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    colors = CardDefaults.cardColors(containerColor = Charcoal),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Column {
@@ -133,13 +138,13 @@ fun AboutScreen(onBack: () -> Unit) {
                     text = "Links",
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Medium,
-                    color = Color(0xFF94A3B8),
+                    color = CardWhite,
                     letterSpacing = 0.8.sp,
                     modifier = Modifier.padding(start = 4.dp, bottom = 6.dp)
                 )
                 Card(
                     shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    colors = CardDefaults.cardColors(containerColor = DeepNavy),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Column {
@@ -157,7 +162,7 @@ fun AboutScreen(onBack: () -> Unit) {
             // Developer credit
             Card(
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFE6F1FB)),
+                colors = CardDefaults.cardColors(containerColor = DeepNavy),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Row(

@@ -15,8 +15,13 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.rapidrescue.R
+import com.example.rapidrescue.ui.theme.CardWhite
+import com.example.rapidrescue.ui.theme.DeepNavy
+import com.example.rapidrescue.ui.theme.PurpleGrey80
+import com.example.rapidrescue.ui.theme.SlateWhite
 import com.example.rapidrescue.ui.theme.black
 import com.example.rapidrescue.ui.theme.maroon
+import com.example.rapidrescue.ui.theme.navyBlue
 import com.example.rapidrescue.ui.theme.white
 
 @Composable
@@ -34,7 +39,7 @@ fun ForgotPasswordScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(maroon)
+            .background(navyBlue)
     ) {
 
     }
@@ -55,7 +60,7 @@ fun ForgotPasswordScreen(
         Text(
             text = "Forgot Password",
             style = MaterialTheme.typography.headlineMedium,
-            color = black
+            color = CardWhite
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -63,7 +68,7 @@ fun ForgotPasswordScreen(
         Text(
             text = "Enter your email to reset your password",
             style = MaterialTheme.typography.bodyMedium,
-            color = white
+            color = SlateWhite
         )
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -72,6 +77,7 @@ fun ForgotPasswordScreen(
             value = email,
             onValueChange = { email = it },
             label = { Text("Email") },
+            shape =  RoundedCornerShape(16.dp) ,
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )

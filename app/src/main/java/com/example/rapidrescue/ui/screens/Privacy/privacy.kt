@@ -1,5 +1,6 @@
 package com.example.rapidrescue.ui.screens.Privacy
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,6 +23,7 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.ui.graphics.SolidColor
 import com.example.rapidrescue.ui.theme.DeepNavy
+import com.example.rapidrescue.ui.theme.PurpleGrey80
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,7 +51,12 @@ fun PrivacyScreen(onBack: () -> Unit) {
     val isFormValid = currentPassword.isNotBlank() &&
             newPassword.length >= 6 &&
             passwordsMatch
-
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+            .background(PurpleGrey80)
+    )
     Scaffold(
         topBar = {
             TopAppBar(
@@ -65,7 +72,7 @@ fun PrivacyScreen(onBack: () -> Unit) {
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        containerColor = Color(0xFFF4F6F9)
+        containerColor = DeepNavy
     ) { padding ->
         Column(
             modifier = Modifier

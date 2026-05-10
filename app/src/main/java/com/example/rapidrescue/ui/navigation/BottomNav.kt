@@ -44,13 +44,13 @@ sealed class BottomNavItem(
     )
     object Settings : BottomNavItem(
         route = ROUTES.Settings.name,
-        label = "Profile",
+        label = "Settings",
         icon = Icons.Default.Settings
     )
     object Contacts : BottomNavItem(
         route = ROUTES.Contacts.name,
         label = "Contacts",
-        icon = Icons.Default.Call
+        icon = Icons.Default.Call,
     )
 
 }

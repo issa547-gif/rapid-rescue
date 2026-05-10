@@ -18,6 +18,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.rapidrescue.ui.theme.CardWhite
+import com.example.rapidrescue.ui.theme.Charcoal
+import com.example.rapidrescue.ui.theme.DeepNavy
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -38,18 +41,18 @@ fun SettingsScreen(onBack: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Settings") },
+                title = { Text("Settings" , color = CardWhite,  fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFFF4F6F9)
+                    containerColor = DeepNavy
                 )
             )
         },
-        containerColor = Color(0xFFF4F6F9)
+        containerColor = DeepNavy
     ) { padding ->
         Column(
             modifier = Modifier
@@ -61,7 +64,7 @@ fun SettingsScreen(onBack: () -> Unit) {
         ) {
 
             // Notifications
-            SettingsSection(title = "Notifications") {
+            SettingsSection(title = "Notifications" ) {
                 SettingsToggle(
                     icon = Icons.Default.Notifications,
                     label = "SOS alerts",
@@ -245,7 +248,7 @@ private fun SettingsSection(title: String, content: @Composable ColumnScope.() -
         )
         Card(
             shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+            colors = CardDefaults.cardColors(containerColor = Charcoal),
             modifier = Modifier.fillMaxWidth()
         ) {
             Column { content() }
