@@ -1,7 +1,7 @@
 package com.example.rapidrescue.data.repositories
 
+import com.example.rapidrescue.data.SupabaseClientProvider
 import com.example.rapidrescue.data.models.AlertModel
-import com.example.rapidrescue.data.superbaseclient.SupabaseClientProvider
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Order

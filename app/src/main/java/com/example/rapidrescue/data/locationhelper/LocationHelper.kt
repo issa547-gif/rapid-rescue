@@ -2,6 +2,7 @@ package com.example.rapidrescue.data.locationhelper
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.location.LocationManager
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
@@ -15,6 +16,7 @@ suspend fun getCurrentLocation(context: Context): Pair<Double, Double> {
     val cancellationToken = CancellationTokenSource()
 
     return suspendCoroutine { continuation ->
+        // try current location first
         client.getCurrentLocation(
             Priority.PRIORITY_HIGH_ACCURACY,
             cancellationToken.token
@@ -22,7 +24,22 @@ suspend fun getCurrentLocation(context: Context): Pair<Double, Double> {
             if (location != null) {
                 continuation.resume(Pair(location.latitude, location.longitude))
             } else {
-                continuation.resumeWithException(Exception("Location unavailable"))
+                // fallback to last known location
+                client.lastLocation
+                    .addOnSuccessListener { lastLocation ->
+                        if (lastLocation != null) {
+                            continuation.resume(
+                                Pair(lastLocation.latitude, lastLocation.longitude)
+                            )
+                        } else {
+                            continuation.resumeWithException(
+                                Exception("Location unavailable. Enable GPS and try again.")
+                            )
+                        }
+                    }
+                    .addOnFailureListener { e ->
+                        continuation.resumeWithException(e)
+                    }
             }
         }.addOnFailureListener { exception ->
             continuation.resumeWithException(exception)

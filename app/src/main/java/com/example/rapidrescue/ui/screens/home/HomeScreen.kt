@@ -16,6 +16,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Map
+import androidx.compose.material.icons.filled.PeopleAlt
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -39,6 +42,8 @@ fun HomeScreen(
     onSOSTrigger: (Double, Double) -> Unit,
     onNavigateToContacts: () -> Unit,
     onNavigateToAlerts: () -> Unit,
+    onNavigateToMaps: () -> Unit,
+
     alertViewModel: AlertViewModel = viewModel()
 ) {
     val context = LocalContext.current
@@ -63,10 +68,16 @@ fun HomeScreen(
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
-        val granted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+        val locationGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
                 permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
-        if (granted) {
+        val smsGranted = permissions[Manifest.permission.SEND_SMS] == true
+
+        if (locationGranted && smsGranted) {
             alertViewModel.triggerSOS(context)
+        } else if (!locationGranted) {
+            // show location denied message
+        } else if (!smsGranted) {
+            // show sms denied message
         }
     }
 
@@ -94,7 +105,7 @@ fun HomeScreen(
                     letterSpacing = 1.sp
                 )
                 Text(
-                    text = "Tap here to alert your emergency contacts",
+                    text = "One tap sends your location to all guardians",
                     fontSize = 13.sp,
                     color = Color(0xFF888888),
                     textAlign = TextAlign.Center
@@ -104,20 +115,20 @@ fun HomeScreen(
             Box(contentAlignment = Alignment.Center) {
                 Box(
                     modifier = Modifier
-                        .size(220.dp)
+                        .size(260.dp)
                         .clip(CircleShape)
                         .background(Color(0xFFB91C1C).copy(alpha = 0.15f))
                 )
                 Box(
                     modifier = Modifier
-                        .size(190.dp)
+                        .size(225.dp)
                         .clip(CircleShape)
                         .background(Color(0xFFB91C1C).copy(alpha = 0.25f))
                 )
                 Box(
                     modifier = Modifier
                         .scale(scale)
-                        .size(160.dp)
+                        .size(190.dp)
                         .clip(CircleShape)
                         .background(Color(0xFFB91C1C))
                         .border(3.dp, Color(0xFFFF5252), CircleShape)
@@ -129,7 +140,8 @@ fun HomeScreen(
                             permissionLauncher.launch(
                                 arrayOf(
                                     Manifest.permission.ACCESS_FINE_LOCATION,
-                                    Manifest.permission.ACCESS_COARSE_LOCATION
+                                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                                    Manifest.permission.SEND_SMS
                                 )
                             )
                         },
@@ -144,9 +156,16 @@ fun HomeScreen(
                     } else {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(
-                                text = "CRITICAL\nALERT",
+                                text = "CRITICAL",
                                 color = Color.White,
-                                fontSize = 20.sp,
+                                fontSize = 22.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                letterSpacing = 4.sp
+                            )
+                            Text(
+                                text = "ALERT",
+                                color = Color.White,
+                                fontSize = 22.sp,
                                 fontWeight = FontWeight.ExtraBold,
                                 letterSpacing = 4.sp
                             )
@@ -161,28 +180,61 @@ fun HomeScreen(
                 }
             }
 
+//            if (sosState is SOSState.Error) {
+//                Text(
+//                    text = (sosState as SOSState.Error).message,
+//                    color = Color(0xFFFF5252),
+//                    fontSize = 13.sp,
+//                    textAlign = TextAlign.Center
+//                )
+//            } else {
+//                Row(
+//                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+//                    verticalAlignment = Alignment.CenterVertically
+//                ) {
+//                    Box(
+//                        modifier = Modifier
+//                            .size(8.dp)
+//                            .clip(CircleShape)
+//                            .background(Color(0xFF4CAF50))
+//                    )
+//                    Text(
+//                        text = "Ready to send alert",
+//                        fontSize = 12.sp,
+//                        color = Color(0xFF4CAF50)
+//                    )
+//                }
+//            }
             if (sosState is SOSState.Error) {
-                Text(
-                    text = (sosState as SOSState.Error).message,
-                    color = Color(0xFFFF5252),
-                    fontSize = 13.sp,
-                    textAlign = TextAlign.Center
-                )
-            } else {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                Card(
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFF1A0A0A)),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .size(8.dp)
-                            .clip(CircleShape)
-                            .background(Color(0xFF4CAF50))
-                    )
                     Text(
-                        text = "Ready to send alert",
-                        fontSize = 12.sp,
-                        color = Color(0xFF4CAF50)
+                        text = (sosState as SOSState.Error).message,
+                        color = Color(0xFFFF5252),
+                        fontSize = 13.sp,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(12.dp)
+                    )
+                }
+            } else if (sosState is SOSState.Success) {
+                Card(
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFF0A1A0A)),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                ) {
+                    Text(
+                        text = "✓ Alert sent to all contacts",
+                        color = Color(0xFF22C55E),
+                        fontSize = 13.sp,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(12.dp)
                     )
                 }
             }
@@ -192,8 +244,8 @@ fun HomeScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 HomeActionButton(
-                    label = "Contacts",
-                    icon = Icons.Default.Call,
+                    label = "Guardians",
+                    icon =  Icons.Default.PeopleAlt,
                     onClick = onNavigateToContacts,
                     modifier = Modifier.weight(1f)
                 )
@@ -203,7 +255,24 @@ fun HomeScreen(
                     onClick = onNavigateToAlerts,
                     modifier = Modifier.weight(1f)
                 )
+
+
             }
+            Column(
+//               horizontalAlignment =  Arrangement.spacedBy(16.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                HomeActionButton(
+                    label = "Maps",
+                    icon = Icons.Default.Map,
+                    onClick = onNavigateToMaps,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+
+
+
+
         }
     }
 }
@@ -219,9 +288,9 @@ private fun HomeActionButton(
         onClick = onClick,
         modifier = modifier.height(52.dp),
         shape = RoundedCornerShape(14.dp),
-        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
+        colors = ButtonDefaults.outlinedButtonColors(contentColor = CardWhite),
         border = ButtonDefaults.outlinedButtonBorder.copy(
-            brush = androidx.compose.ui.graphics.SolidColor(Color(0xFF333333))
+            brush = androidx.compose.ui.graphics.SolidColor(Color(0xFF6E6A6A))
         )
     ) {
         Icon(
@@ -231,7 +300,7 @@ private fun HomeActionButton(
             tint = Color(0xFF888888)
         )
         Spacer(modifier = Modifier.width(8.dp))
-        Text(text = label, fontSize = 14.sp, color = Color(0xFFCCCCCC))
+        Text(text = label, fontSize = 12.sp, color = Color(0xFFCCCCCC))
     }
 }
 

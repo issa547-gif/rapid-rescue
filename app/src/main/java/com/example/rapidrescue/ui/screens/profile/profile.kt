@@ -23,6 +23,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.rapidrescue.ui.theme.CardWhite
 import com.example.rapidrescue.ui.theme.Charcoal
 import com.example.rapidrescue.ui.theme.DeepNavy
+import com.example.rapidrescue.ui.theme.grey
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,6 +33,7 @@ fun ProfileScreen(
     onNavigateToPrivacy: () -> Unit,
     onNavigateToHelp: () -> Unit,
     onNavigateToAbout: () -> Unit,
+    onNavigateToMaps: () -> Unit,
     onLogout: () -> Unit,
     viewModel: ProfileViewModel = viewModel()
 ) {
@@ -47,7 +49,7 @@ fun ProfileScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Profile", color = CardWhite) },
+                title = { Text("Profile", color = CardWhite, ) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = DeepNavy
                 )
@@ -76,7 +78,7 @@ fun ProfileScreen(
                 // Avatar + info card
                 Card(
                     shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    colors = CardDefaults.cardColors(containerColor = grey),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Column {
@@ -176,7 +178,7 @@ fun ProfileScreen(
                 // Medical summary card
                 Card(
                     shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = Charcoal),
+                    colors = CardDefaults.cardColors(containerColor = grey),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
@@ -188,14 +190,14 @@ fun ProfileScreen(
                             Icon(
                                 imageVector = Icons.Default.Favorite,
                                 contentDescription = null,
-                                tint = Color(0xFFB91C1C),
+                                tint = DeepNavy,
                                 modifier = Modifier.size(18.dp)
                             )
                             Text(
                                 text = "Medical summary",
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.SemiBold,
-                                color = Color(0xFFB91C1C)
+                                color = DeepNavy
                             )
                         }
                         Row(
@@ -224,7 +226,7 @@ fun ProfileScreen(
                         icon = Icons.Default.Favorite,
                         label = "Medical information",
                         subtitle = "Blood type, allergies, medications",
-                        tint = Color(0xFFB91C1C),
+                        tint = DeepNavy,
                         onClick = onNavigateToMedical
                     )
                     ProfileMenuDivider()
@@ -232,7 +234,7 @@ fun ProfileScreen(
                         icon = Icons.Default.Lock,
                         label = "Privacy & security",
                         subtitle = "Password, data sharing",
-                        tint = Color(0xFF1E5FA5),
+                        tint = DeepNavy,
                         onClick = onNavigateToPrivacy
                     )
                 }
@@ -243,7 +245,7 @@ fun ProfileScreen(
                         icon = Icons.Default.Settings,
                         label = "Settings",
                         subtitle = "Notifications, theme, language",
-                        tint = Color(0xFF64748B),
+                        tint = DeepNavy,
                         onClick = onNavigateToSettings
                     )
                     ProfileMenuDivider()
@@ -251,7 +253,7 @@ fun ProfileScreen(
                         icon = Icons.Default.Info,
                         label = "Help & support",
                         subtitle = "FAQs, contact us",
-                        tint = Color(0xFF64748B),
+                        tint = DeepNavy,
                         onClick = onNavigateToHelp
                     )
                     ProfileMenuDivider()
@@ -259,15 +261,23 @@ fun ProfileScreen(
                         icon = Icons.Default.Star,
                         label = "About RapidRescue",
                         subtitle = "Version 1.0.0",
-                        tint = Color(0xFF64748B),
+                        tint = DeepNavy,
                         onClick = onNavigateToAbout
+                    )
+                    ProfileMenuDivider()
+                    ProfileMenuItem(
+                        icon = Icons.Default.Map,
+                        label = "Maps",
+                        subtitle = "Your location",
+                        tint = DeepNavy,
+                        onClick = onNavigateToMaps
                     )
                 }
 
                 // Logout
                 Card(
                     shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    colors = CardDefaults.cardColors(containerColor = grey),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Row(
@@ -309,8 +319,10 @@ fun ProfileScreen(
 }
 
 @Composable
-private fun MedicalStat(label: String, value: String) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+private fun MedicalStat(label: String, value: String)
+{
+    Column(horizontalAlignment = Alignment.CenterHorizontally)
+    {
         Text(
             text = value,
             fontSize = 18.sp,
@@ -320,7 +332,7 @@ private fun MedicalStat(label: String, value: String) {
         Text(
             text = label,
             fontSize = 11.sp,
-            color = Color(0xFF64748B)
+            color = DeepNavy
         )
     }
 }
@@ -335,13 +347,13 @@ private fun ProfileSection(
             text = title,
             fontSize = 11.sp,
             fontWeight = FontWeight.Medium,
-            color = Color(0xFF94A3B8),
+            color = DeepNavy,
             letterSpacing = 0.8.sp,
             modifier = Modifier.padding(start = 4.dp, bottom = 6.dp)
         )
         Card(
             shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+            colors = CardDefaults.cardColors(containerColor = grey),
             modifier = Modifier.fillMaxWidth()
         ) {
             Column { content() }

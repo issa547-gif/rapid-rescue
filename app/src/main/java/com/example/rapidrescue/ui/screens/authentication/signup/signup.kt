@@ -26,6 +26,7 @@ import com.airbnb.lottie.compose.*
 import com.example.rapidrescue.R
 import com.example.rapidrescue.ui.screens.authentication.authviewmodel.AuthState
 import com.example.rapidrescue.ui.screens.authentication.authviewmodel.AuthViewModel
+import com.example.rapidrescue.ui.theme.CardWhite
 import com.example.rapidrescue.ui.theme.Charcoal
 import com.example.rapidrescue.ui.theme.DeepNavy
 import com.example.rapidrescue.ui.theme.PurpleGrey80
@@ -74,11 +75,11 @@ fun SignUpScreen(
 
         contentAlignment = Alignment.Center
     ) {
-        LottieAnimation(
-            composition = composition,
-            progress = { progress },
-            modifier = Modifier.size(140.dp)
-        )
+//        LottieAnimation(
+//            composition = composition,
+//            progress = { progress },
+//            modifier = Modifier.size(140.dp)
+//        )
         ElevatedCard(
             modifier = Modifier
                 .fillMaxWidth()
@@ -111,7 +112,7 @@ fun SignUpScreen(
                     text = "Create account",
                     fontSize = 25.sp,
                     fontWeight = FontWeight.Bold,
-                    color = DeepNavy,
+                    color = CardWhite,
                     modifier = Modifier.fillMaxWidth()
                 )
                 Text(
@@ -134,7 +135,7 @@ fun SignUpScreen(
                     leadingIcon = {
                         Icon(
                             imageVector = ImageVector.vectorResource(R.drawable.name),
-                            contentDescription = "Email",
+                            contentDescription = "Name",
                             tint = primaryColor
                         )
                     }
@@ -265,7 +266,8 @@ fun SignUpScreen(
                         .fillMaxWidth()
                         .height(52.dp),
                     shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = TrustBlue)
+                    colors = ButtonDefaults.buttonColors(containerColor = TrustBlue,
+                        disabledContainerColor = Color(0xFF1B3A5C))
                 ) {
                     if (authState is AuthState.Loading) {
                         CircularProgressIndicator(

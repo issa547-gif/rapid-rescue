@@ -10,7 +10,7 @@ data class Contact(
     val userId: String = "",
     val name: String = "",
     val phone: String = "",
-    val relationship: String = "",
+    val relationship: String? = null,
     @SerialName("is_guardian")
     val isGuardian: Boolean = false
 )

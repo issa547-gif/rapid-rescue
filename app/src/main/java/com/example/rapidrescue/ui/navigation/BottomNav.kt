@@ -52,5 +52,10 @@ sealed class BottomNavItem(
         label = "Contacts",
         icon = Icons.Default.Call,
     )
+    object Maps : BottomNavItem(
+        route = ROUTES.Map.name,
+        label = "Maps",
+        icon = Icons.Default.Call,
+    )
 
 }

@@ -47,7 +47,7 @@ fun OnboardingScreen(
         LottieAnimation(
             composition = composition,
             progress = { progress },
-            modifier = Modifier.size(220.dp)
+            modifier = Modifier.size(220.dp),
         )
 
         Spacer(modifier = Modifier.height(20.dp))

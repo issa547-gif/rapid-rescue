@@ -18,6 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -104,9 +105,10 @@ fun LoginScreen(
 
                 Text(
                     text = "Welcome back",
-                    fontSize = 25.sp,
+                    fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
                     color = CardWhite,
+                    textAlign = TextAlign.Center,
 
 
                 )
@@ -115,7 +117,8 @@ fun LoginScreen(
                     fontSize = 14.sp,
                     color = Color(0xFF5F6C7E),
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(top = 4.dp, bottom = 20.dp)
+                    modifier = Modifier.padding(top = 4.dp, bottom = 20.dp),
+                    textAlign = TextAlign.Center
                 )
 
                 OutlinedTextField(
@@ -187,7 +190,8 @@ fun LoginScreen(
                         .fillMaxWidth()
                         .height(52.dp),
                     shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = TrustBlue)
+                    colors = ButtonDefaults.buttonColors(containerColor = TrustBlue
+                    , disabledContainerColor = Color(0xFF1B3A5C))
                 ) {
                     if (authState is AuthState.Loading) {
                         CircularProgressIndicator(

@@ -1,5 +1,12 @@
 package com.example.rapidrescue.ui.screens.Settings
 
+import android.Manifest
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -15,36 +22,96 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.NotificationManagerCompat
 import com.example.rapidrescue.ui.theme.CardWhite
-import com.example.rapidrescue.ui.theme.Charcoal
 import com.example.rapidrescue.ui.theme.DeepNavy
+import com.example.rapidrescue.ui.theme.grey
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(onBack: () -> Unit) {
+    val context = LocalContext.current
+
     var sosNotifications by remember { mutableStateOf(true) }
     var guardianAlerts by remember { mutableStateOf(true) }
     var checkInReminders by remember { mutableStateOf(false) }
     var locationSharing by remember { mutableStateOf(true) }
-    var darkMode by remember { mutableStateOf(false) }
     var selectedLanguage by remember { mutableStateOf("English") }
     var selectedTheme by remember { mutableStateOf("System default") }
+    var showLanguageDialog by remember { mutableStateOf(false) }
+    var showThemeDialog by remember { mutableStateOf(false) }
+
+    // check real permission states
+    var locationGranted by remember {
+        mutableStateOf(
+            androidx.core.content.ContextCompat.checkSelfPermission(
+                context, Manifest.permission.ACCESS_FINE_LOCATION
+            ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+        )
+    }
+    var smsGranted by remember {
+        mutableStateOf(
+            androidx.core.content.ContextCompat.checkSelfPermission(
+                context, Manifest.permission.SEND_SMS
+            ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+        )
+    }
+    var notificationsGranted by remember {
+        mutableStateOf(
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                androidx.core.content.ContextCompat.checkSelfPermission(
+                    context, Manifest.permission.POST_NOTIFICATIONS
+                ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+            } else {
+                NotificationManagerCompat.from(context).areNotificationsEnabled()
+            }
+        )
+    }
+
+    // permission launchers
+    val locationLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        locationGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+                permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+    }
+
+    val smsLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        smsGranted = granted
+    }
+
+    val notificationLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        notificationsGranted = granted
+    }
 
     val languages = listOf("English", "Swahili", "French", "Arabic")
     val themes = listOf("System default", "Light", "Dark")
-    var showLanguageDialog by remember { mutableStateOf(false) }
-    var showThemeDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Settings" , color = CardWhite,  fontWeight = FontWeight.Bold) },
+                title = {
+                    Text(
+                        "Settings",
+                        color = CardWhite,
+                        fontWeight = FontWeight.Bold
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            contentDescription = "Back",
+                            tint = CardWhite
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -64,14 +131,27 @@ fun SettingsScreen(onBack: () -> Unit) {
         ) {
 
             // Notifications
-            SettingsSection(title = "Notifications" ) {
+            SettingsSection(title = "Notifications") {
                 SettingsToggle(
                     icon = Icons.Default.Notifications,
                     label = "SOS alerts",
                     subtitle = "Get notified when an SOS is triggered",
                     tint = Color(0xFFB91C1C),
                     checked = sosNotifications,
-                    onCheckedChange = { sosNotifications = it }
+                    onCheckedChange = {
+                        sosNotifications = it
+                        if (it && !notificationsGranted) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                notificationLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                            } else {
+                                // open notification settings for older Android
+                                val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                                    putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+                                }
+                                context.startActivity(intent)
+                            }
+                        }
+                    }
                 )
                 SettingsDivider()
                 SettingsToggle(
@@ -100,8 +180,23 @@ fun SettingsScreen(onBack: () -> Unit) {
                     label = "Background location",
                     subtitle = "Share location with guardians during SOS",
                     tint = Color(0xFF1E5FA5),
-                    checked = locationSharing,
-                    onCheckedChange = { locationSharing = it }
+                    checked = locationSharing && locationGranted,
+                    onCheckedChange = { enabled ->
+                        if (enabled) {
+                            if (!locationGranted) {
+                                locationLauncher.launch(
+                                    arrayOf(
+                                        Manifest.permission.ACCESS_FINE_LOCATION,
+                                        Manifest.permission.ACCESS_COARSE_LOCATION
+                                    )
+                                )
+                            } else {
+                                locationSharing = true
+                            }
+                        } else {
+                            locationSharing = false
+                        }
+                    }
                 )
             }
 
@@ -124,33 +219,80 @@ fun SettingsScreen(onBack: () -> Unit) {
                 )
             }
 
-            // Permissions
+            // Permissions — now tappable to request/open settings
             SettingsSection(title = "App permissions") {
-                SettingsAction(
+                SettingsActionClickable(
                     icon = Icons.Default.LocationOn,
                     label = "Location access",
                     subtitle = "Required for SOS and map features",
                     tint = Color(0xFF1E5FA5),
-                    actionLabel = "Granted",
-                    actionColor = Color(0xFF22C55E)
+                    actionLabel = if (locationGranted) "Granted" else "Grant",
+                    actionColor = if (locationGranted) Color(0xFF22C55E) else Color(0xFFB91C1C),
+                    onClick = {
+                        if (!locationGranted) {
+                            locationLauncher.launch(
+                                arrayOf(
+                                    Manifest.permission.ACCESS_FINE_LOCATION,
+                                    Manifest.permission.ACCESS_COARSE_LOCATION
+                                )
+                            )
+                        } else {
+                            // open app settings to revoke if already granted
+                            context.startActivity(
+                                Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                    data = Uri.fromParts("package", context.packageName, null)
+                                }
+                            )
+                        }
+                    }
                 )
                 SettingsDivider()
-                SettingsAction(
+                SettingsActionClickable(
                     icon = Icons.Default.Notifications,
                     label = "Notifications",
                     subtitle = "Required for alert delivery",
                     tint = Color(0xFFB91C1C),
-                    actionLabel = "Granted",
-                    actionColor = Color(0xFF22C55E)
+                    actionLabel = if (notificationsGranted) "Granted" else "Grant",
+                    actionColor = if (notificationsGranted) Color(0xFF22C55E) else Color(0xFFB91C1C),
+                    onClick = {
+                        if (!notificationsGranted) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                notificationLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                            } else {
+                                context.startActivity(
+                                    Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                                        putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+                                    }
+                                )
+                            }
+                        } else {
+                            context.startActivity(
+                                Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                                    putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+                                }
+                            )
+                        }
+                    }
                 )
                 SettingsDivider()
-                SettingsAction(
+                SettingsActionClickable(
                     icon = Icons.Default.Phone,
                     label = "Phone / SMS",
                     subtitle = "For sending emergency SMS",
                     tint = Color(0xFF0D9488),
-                    actionLabel = "Not set",
-                    actionColor = Color(0xFFB91C1C)
+                    actionLabel = if (smsGranted) "Granted" else "Grant",
+                    actionColor = if (smsGranted) Color(0xFF22C55E) else Color(0xFFB91C1C),
+                    onClick = {
+                        if (!smsGranted) {
+                            smsLauncher.launch(Manifest.permission.SEND_SMS)
+                        } else {
+                            context.startActivity(
+                                Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                    data = Uri.fromParts("package", context.packageName, null)
+                                }
+                            )
+                        }
+                    }
                 )
             }
 
@@ -158,10 +300,12 @@ fun SettingsScreen(onBack: () -> Unit) {
         }
     }
 
+    // Language dialog
     if (showLanguageDialog) {
         AlertDialog(
             onDismissRequest = { showLanguageDialog = false },
-            title = { Text("Select language") },
+            containerColor = Color(0xFF0F1E35),
+            title = { Text("Select language", color = Color(0xFFE8ECF0)) },
             text = {
                 Column {
                     languages.forEach { lang ->
@@ -176,7 +320,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text(lang, fontSize = 14.sp)
+                            Text(lang, fontSize = 14.sp, color = Color(0xFFE8ECF0))
                             if (lang == selectedLanguage) {
                                 Icon(
                                     Icons.Default.Check,
@@ -187,7 +331,10 @@ fun SettingsScreen(onBack: () -> Unit) {
                             }
                         }
                         if (lang != languages.last()) {
-                            HorizontalDivider(thickness = 0.5.dp, color = Color(0xFFE2E6ED))
+                            HorizontalDivider(
+                                thickness = 0.5.dp,
+                                color = Color(0xFF1B3A5C)
+                            )
                         }
                     }
                 }
@@ -196,10 +343,12 @@ fun SettingsScreen(onBack: () -> Unit) {
         )
     }
 
+    // Theme dialog
     if (showThemeDialog) {
         AlertDialog(
             onDismissRequest = { showThemeDialog = false },
-            title = { Text("Select theme") },
+            containerColor = Color(0xFF0F1E35),
+            title = { Text("Select theme", color = Color(0xFFE8ECF0)) },
             text = {
                 Column {
                     themes.forEach { theme ->
@@ -214,7 +363,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text(theme, fontSize = 14.sp)
+                            Text(theme, fontSize = 14.sp, color = Color(0xFFE8ECF0))
                             if (theme == selectedTheme) {
                                 Icon(
                                     Icons.Default.Check,
@@ -225,7 +374,10 @@ fun SettingsScreen(onBack: () -> Unit) {
                             }
                         }
                         if (theme != themes.last()) {
-                            HorizontalDivider(thickness = 0.5.dp, color = Color(0xFFE2E6ED))
+                            HorizontalDivider(
+                                thickness = 0.5.dp,
+                                color = Color(0xFF1B3A5C)
+                            )
                         }
                     }
                 }
@@ -248,7 +400,7 @@ private fun SettingsSection(title: String, content: @Composable ColumnScope.() -
         )
         Card(
             shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Charcoal),
+            colors = CardDefaults.cardColors(containerColor = grey),
             modifier = Modifier.fillMaxWidth()
         ) {
             Column { content() }
@@ -261,7 +413,7 @@ private fun SettingsDivider() {
     HorizontalDivider(
         modifier = Modifier.padding(start = 64.dp),
         thickness = 0.5.dp,
-        color = Color(0xFFE2E6ED)
+        color = Color(0xFF1B3A5C)
     )
 }
 
@@ -291,7 +443,7 @@ private fun SettingsToggle(
             Icon(icon, contentDescription = null, tint = tint, modifier = Modifier.size(18.dp))
         }
         Column(modifier = Modifier.weight(1f)) {
-            Text(label, fontSize = 14.sp, fontWeight = FontWeight.Medium, color = Color(0xFF1A2233))
+            Text(label, fontSize = 14.sp, fontWeight = FontWeight.Medium, color = Color(0xFFE8ECF0))
             Text(subtitle, fontSize = 12.sp, color = Color(0xFF94A3B8))
         }
         Switch(
@@ -299,7 +451,9 @@ private fun SettingsToggle(
             onCheckedChange = onCheckedChange,
             colors = SwitchDefaults.colors(
                 checkedThumbColor = Color.White,
-                checkedTrackColor = Color(0xFF1E5FA5)
+                checkedTrackColor = Color(0xFF1E5FA5),
+                uncheckedThumbColor = Color(0xFF94A3B8),
+                uncheckedTrackColor = Color(0xFF1B3A5C)
             )
         )
     }
@@ -330,24 +484,37 @@ private fun SettingsChoice(
         ) {
             Icon(icon, contentDescription = null, tint = tint, modifier = Modifier.size(18.dp))
         }
-        Text(label, fontSize = 14.sp, fontWeight = FontWeight.Medium, color = Color(0xFF1A2233), modifier = Modifier.weight(1f))
+        Text(
+            label,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Medium,
+            color = Color(0xFFE8ECF0),
+            modifier = Modifier.weight(1f)
+        )
         Text(value, fontSize = 13.sp, color = Color(0xFF94A3B8))
-        Icon(Icons.Default.KeyboardArrowRight, contentDescription = null, tint = Color(0xFFCBD5E1), modifier = Modifier.size(18.dp))
+        Icon(
+            Icons.Default.KeyboardArrowRight,
+            contentDescription = null,
+            tint = Color(0xFF94A3B8),
+            modifier = Modifier.size(18.dp)
+        )
     }
 }
 
 @Composable
-private fun SettingsAction(
+private fun SettingsActionClickable(
     icon: ImageVector,
     label: String,
     subtitle: String,
     tint: Color,
     actionLabel: String,
-    actionColor: Color
+    actionColor: Color,
+    onClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .clickable { onClick() }
             .padding(horizontal = 16.dp, vertical = 14.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -362,14 +529,20 @@ private fun SettingsAction(
             Icon(icon, contentDescription = null, tint = tint, modifier = Modifier.size(18.dp))
         }
         Column(modifier = Modifier.weight(1f)) {
-            Text(label, fontSize = 14.sp, fontWeight = FontWeight.Medium, color = Color(0xFF1A2233))
+            Text(label, fontSize = 14.sp, fontWeight = FontWeight.Medium, color = Color(0xFFE8ECF0))
             Text(subtitle, fontSize = 12.sp, color = Color(0xFF94A3B8))
         }
-        Text(
-            text = actionLabel,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Medium,
-            color = actionColor
-        )
+        Surface(
+            shape = RoundedCornerShape(8.dp),
+            color = actionColor.copy(alpha = 0.15f)
+        ) {
+            Text(
+                text = actionLabel,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Medium,
+                color = actionColor,
+                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+            )
+        }
     }
 }

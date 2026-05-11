@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import com.example.rapidrescue.ui.theme.CardWhite
 import com.example.rapidrescue.ui.theme.Charcoal
 import com.example.rapidrescue.ui.theme.DeepNavy
+import com.example.rapidrescue.ui.theme.grey
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,7 +57,7 @@ fun AboutScreen(onBack: () -> Unit) {
             // App identity card
             Card(
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Charcoal),
+                colors = CardDefaults.cardColors(containerColor = grey),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(
@@ -89,12 +90,12 @@ fun AboutScreen(onBack: () -> Unit) {
                     Text(
                         text = "Version 1.0.0 (Build 1)",
                         fontSize = 13.sp,
-                        color = CardWhite
+                        color = DeepNavy
                     )
                     Text(
                         text = "One tap sends your location to your emergency contacts when you're in danger.",
                         fontSize = 13.sp,
-                        color = CardWhite,
+                        color = DeepNavy,
                         textAlign = TextAlign.Center,
                         lineHeight = 20.sp
                     )
@@ -107,13 +108,13 @@ fun AboutScreen(onBack: () -> Unit) {
                     text = "Built with",
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Medium,
-                    color = Color(0xFF94A3B8),
+                    color = DeepNavy,
                     letterSpacing = 0.8.sp,
                     modifier = Modifier.padding(start = 4.dp, bottom = 6.dp)
                 )
                 Card(
                     shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = Charcoal),
+                    colors = CardDefaults.cardColors(containerColor = grey),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Column {
@@ -144,7 +145,7 @@ fun AboutScreen(onBack: () -> Unit) {
                 )
                 Card(
                     shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = DeepNavy),
+                    colors = CardDefaults.cardColors(containerColor = grey),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Column {
@@ -182,14 +183,15 @@ fun AboutScreen(onBack: () -> Unit) {
                     Column {
                         Text(
                             text = "Designed & built by Issa",
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Medium,
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Bold,
                             color = Color(0xFF185FA5)
                         )
                         Text(
                             text = "Full-stack Android developer",
                             fontSize = 12.sp,
-                            color = Color(0xFF378ADD)
+                            color = Color(0xFF378ADD),
+                            fontWeight = FontWeight.Bold
                         )
                     }
                 }

@@ -22,8 +22,10 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.ui.graphics.SolidColor
+import com.example.rapidrescue.ui.theme.CardWhite
 import com.example.rapidrescue.ui.theme.DeepNavy
 import com.example.rapidrescue.ui.theme.PurpleGrey80
+import com.example.rapidrescue.ui.theme.grey
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -89,13 +91,13 @@ fun PrivacyScreen(onBack: () -> Unit) {
                     text = "Change password",
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Bold,
-                    color = DeepNavy,
+                    color = CardWhite,
                     letterSpacing = 0.8.sp,
                     modifier = Modifier.padding(start = 4.dp, bottom = 6.dp)
                 )
                 Card(
                     shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    colors = CardDefaults.cardColors(containerColor = grey),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Column(
@@ -212,7 +214,7 @@ fun PrivacyScreen(onBack: () -> Unit) {
                 )
                 Card(
                     shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    colors = CardDefaults.cardColors(containerColor = grey),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Column {
@@ -261,7 +263,7 @@ fun PrivacyScreen(onBack: () -> Unit) {
                 )
                 Card(
                     shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFFFEF2F2)),
+                    colors = CardDefaults.cardColors(containerColor = grey),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Column(
@@ -317,8 +319,8 @@ private fun PrivacyToggleRow(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            Text(label, fontSize = 14.sp, fontWeight = FontWeight.Medium, color = Color(0xFF1A2233))
-            Text(subtitle, fontSize = 12.sp, color = Color(0xFF94A3B8))
+            Text(label, fontSize = 14.sp, fontWeight = FontWeight.Medium, color = DeepNavy)
+            Text(subtitle, fontSize = 12.sp, color = DeepNavy)
         }
         Switch(
             checked = checked,

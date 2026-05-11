@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.rapidrescue.data.models.AlertModel
 import com.example.rapidrescue.ui.theme.DeepNavy
+import com.example.rapidrescue.ui.theme.grey
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,7 +46,7 @@ fun AlertsScreen(
                         Icon(
                             Icons.Default.Refresh,
                             contentDescription = "Refresh",
-                            tint = Color(0xFF1E5FA5)
+                            tint = grey
                         )
                     }
                 },
@@ -129,7 +130,7 @@ fun AlertsScreen(
 private fun AlertCard(alert: AlertModel) {
     Card(
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = grey),
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(
@@ -150,25 +151,26 @@ private fun AlertCard(alert: AlertModel) {
                 Text(
                     text = "SOS triggered",
                     fontSize = 14.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color(0xFF1A2233)
+                    fontWeight = FontWeight.Bold,
+                    color = DeepNavy
+
                 )
                 Text(
                     text = "Lat: %.5f  Lng: %.5f".format(alert.lat, alert.lng),
                     fontSize = 12.sp,
-                    color = Color(0xFF64748B)
+                    color = DeepNavy
                 )
                 if (alert.address.isNotBlank()) {
                     Text(
                         text = alert.address,
                         fontSize = 12.sp,
-                        color = Color(0xFF64748B)
+                        color = DeepNavy
                     )
                 }
                 Text(
                     text = formatTimestamp(alert.createdAt),
                     fontSize = 11.sp,
-                    color = Color(0xFF94A3B8)
+                    color = DeepNavy
                 )
             }
 

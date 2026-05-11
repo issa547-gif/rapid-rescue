@@ -22,6 +22,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.rapidrescue.data.models.Profile
 import com.example.rapidrescue.data.repositories.ProfileRepository
 import com.example.rapidrescue.ui.theme.DeepNavy
+import com.example.rapidrescue.ui.theme.grey
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -140,7 +141,7 @@ fun MedicalScreen(
             // Info banner
             Card(
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFFEF2F2)),
+                colors = CardDefaults.cardColors(containerColor = grey),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
@@ -305,13 +306,13 @@ private fun MedicalSection(
             text = title,
             fontSize = 11.sp,
             fontWeight = FontWeight.Medium,
-            color = Color(0xFF94A3B8),
+            color = DeepNavy,
             letterSpacing = 0.8.sp,
             modifier = Modifier.padding(start = 4.dp, bottom = 6.dp)
         )
         Card(
             shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+            colors = CardDefaults.cardColors(containerColor = grey),
             modifier = Modifier.fillMaxWidth()
         ) {
             Column(

@@ -79,7 +79,8 @@ fun Navigation() {
                     navController.navigate(ROUTES.receiverRoute(lat, lng))
                 },
                 onNavigateToContacts = { navController.navigate(ROUTES.Contacts.name) },
-                onNavigateToAlerts = { navController.navigate(ROUTES.Alerts.name) }
+                onNavigateToAlerts = { navController.navigate(ROUTES.Alerts.name) },
+                onNavigateToMaps = {navController.navigate(ROUTES.Map.name)}
             )
         }
 
@@ -117,6 +118,8 @@ fun Navigation() {
                 onNavigateToPrivacy = { navController.navigate("privacy") },
                 onNavigateToHelp = { navController.navigate("help") },
                 onNavigateToAbout = { navController.navigate("about") },
+                onNavigateToMaps = { navController.navigate("map") },
+
                 onLogout = {
                     navController.navigate(ROUTES.Login.name) {
                         popUpTo(ROUTES.Home.name) { inclusive = true }

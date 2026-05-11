@@ -16,6 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.rapidrescue.ui.theme.DeepNavy
+import com.example.rapidrescue.ui.theme.grey
 
 data class FaqItem(val question: String, val answer: String)
 
@@ -76,7 +77,7 @@ fun HelpScreen(onBack: () -> Unit) {
             // Contact support card
             Card(
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFE6F1FB)),
+                colors = CardDefaults.cardColors(containerColor = grey),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Row(
@@ -118,7 +119,7 @@ fun HelpScreen(onBack: () -> Unit) {
 
             Card(
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(containerColor = grey),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column {
@@ -147,7 +148,7 @@ fun HelpScreen(onBack: () -> Unit) {
 
             Card(
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(containerColor = grey),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column {
@@ -185,7 +186,7 @@ private fun FaqRow(faq: FaqItem) {
                 text = faq.question,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
-                color = Color(0xFF1A2233),
+                color = DeepNavy,
                 modifier = Modifier.weight(1f)
             )
             Icon(
@@ -200,7 +201,7 @@ private fun FaqRow(faq: FaqItem) {
             Text(
                 text = faq.answer,
                 fontSize = 13.sp,
-                color = Color(0xFF64748B),
+                color = DeepNavy,
                 lineHeight = 20.sp
             )
         }
@@ -216,7 +217,7 @@ private fun EmergencyNumberRow(service: String, number: String) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(service, fontSize = 14.sp, color = Color(0xFF1A2233))
+        Text(service, fontSize = 14.sp, color = DeepNavy)
         Text(
             text = number,
             fontSize = 16.sp,

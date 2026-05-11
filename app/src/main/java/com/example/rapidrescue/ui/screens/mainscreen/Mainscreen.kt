@@ -26,6 +26,7 @@ import com.example.rapidrescue.ui.screens.alerts.AlertsScreen
 import com.example.rapidrescue.ui.screens.contacts.ContactsScreen
 import com.example.rapidrescue.ui.screens.guardians.GuardiansScreen
 import com.example.rapidrescue.ui.screens.home.HomeScreen
+import com.example.rapidrescue.ui.screens.map.MapScreen
 import com.example.rapidrescue.ui.screens.medical.MedicalScreen
 import com.example.rapidrescue.ui.screens.profile.ProfileScreen
 import com.example.rapidrescue.ui.screens.receiver.ReceiverScreen
@@ -57,6 +58,7 @@ fun MainScreen(onLogout: () -> Unit) {
         ROUTES.Settings.name,
         ROUTES.Privacy.name,
         ROUTES.About.name,
+        ROUTES.Map.name
 
     )
 
@@ -121,8 +123,10 @@ fun MainScreen(onLogout: () -> Unit) {
                     },
                     onNavigateToAlerts = { navController.navigate(ROUTES.Alerts.name) },
                     onNavigateToContacts = { navController.navigate(ROUTES.Guardians.name) },
+                    onNavigateToMaps = { navController.navigate(ROUTES.Map.name) },
 
-                )
+
+                    )
             }
 
 //            composable(ROUTES.Map.name) {
@@ -148,10 +152,13 @@ fun MainScreen(onLogout: () -> Unit) {
                     onNavigateToPrivacy = { navController.navigate(ROUTES.Privacy.name) },
                     onNavigateToHelp = { navController.navigate(ROUTES.Help.name) },
                     onNavigateToAbout = { navController.navigate(ROUTES.About.name) },
+                    onNavigateToMaps = { navController.navigate(ROUTES.Map.name) },
                     onLogout = onLogout
                 )
             }
-
+            composable(ROUTES.Map.name) {
+                MapScreen()
+            }
             composable(ROUTES.Settings.name) {
                 SettingsScreen(onBack = { navController.popBackStack() })
             }

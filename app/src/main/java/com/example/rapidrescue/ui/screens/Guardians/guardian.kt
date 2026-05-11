@@ -24,6 +24,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.rapidrescue.data.models.Contact
 import com.example.rapidrescue.data.repositories.ContactRepository
+import com.example.rapidrescue.ui.theme.CardWhite
 import com.example.rapidrescue.ui.theme.DeepNavy
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -276,9 +277,9 @@ private fun GuardianCard(guardian: Contact, onDelete: () -> Unit) {
                     fontSize = 13.sp,
                     color = Color(0xFF64748B)
                 )
-                if (guardian.relationship.isNotBlank()) {
+                if (!guardian.relationship.isNullOrBlank()) {
                     Text(
-                        text = guardian.relationship,
+                        text = guardian.relationship!!,
                         fontSize = 12.sp,
                         color = Color(0xFF94A3B8)
                     )
@@ -335,7 +336,7 @@ private fun AddGuardianSheet(
                 text = "Add trusted guardian",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.SemiBold,
-                color = Color(0xFF1A2233)
+                color = CardWhite
             )
             Text(
                 text = "Guardians receive your location when you trigger SOS.",

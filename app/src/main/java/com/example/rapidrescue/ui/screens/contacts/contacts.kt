@@ -180,7 +180,7 @@ private fun ContactCard(
                     fontSize = 13.sp,
                     color = Color(0xFF64748B)
                 )
-                if (contact.relationship.isNotBlank()) {
+                if (!contact.relationship.isNullOrBlank()) {
                     Text(
                         text = contact.relationship,
                         fontSize = 12.sp,
