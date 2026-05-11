@@ -258,15 +258,20 @@ fun HomeScreen(
 
 
             }
-            Column(
-//               horizontalAlignment =  Arrangement.spacedBy(16.dp),
-                modifier = Modifier.fillMaxWidth()
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+
+
+
             ) {
                 HomeActionButton(
                     label = "Maps",
                     icon = Icons.Default.Map,
                     onClick = onNavigateToMaps,
-                    modifier = Modifier.weight(1f)
+//                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .width(120.dp)
                 )
             }
 
